@@ -1,0 +1,34 @@
+{
+  "status": 200,
+  "data": [{
+    "RefundChannel": "测试",
+    "ChannelType": "测试",
+    "ShopName": "测试",
+    "OperateDepartment": "测试",
+    "PlatformOrderNo": "测试",
+    "YATPOrderNo": "测试",
+    "RefundType": 1,
+    "RefundReason": "测试",
+    "PassengerInfos": "张三｜PEK-CTU",
+    "RefundMsg": "测试",
+    "RefundTime": "测试",
+    "Attachment": "测试",
+    "RefundAccout": "测试",
+    "OriginalData": "测试"
+  },{
+    "RefundChannel": "测试",
+    "ChannelType": "测试",
+    "ShopName": "测试",
+    "OperateDepartment": "测试",
+    "PlatformOrderNo": "测试",
+    "YATPOrderNo": "测试",
+    "RefundType": 2,
+    "RefundReason": "测试",
+    "PassengerInfos": "李四｜PEK-CTU,CTU-PEK",
+    "RefundMsg": "测试",
+    "RefundTime": "测试",
+    "Attachment": "测试",
+    "RefundAccout": "测试",
+    "OriginalData": "测试"
+  }]
+}
