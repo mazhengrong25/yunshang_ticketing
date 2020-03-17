@@ -3,7 +3,20 @@
     <div class="search_header">
       <div class="search_box">
         <span>渠道名称：</span>
-        <div class="channel_input" @click="openChannelDialog">{{channelName}}</div>
+<!--        <div class="channel_input" @click="openChannelDialog">{{channelName}}</div>-->
+        <el-select
+          @input="onChang($event)"
+          v-model="searchData.refund_channel"
+          clearable
+          size="small"
+          placeholder="请选择">
+          <el-option
+            v-for="item in orderName"
+            :key="item.ID"
+            :label="item.channel_name"
+            :value="item.channel_name">
+          </el-option>
+        </el-select>
       </div>
 
       <div class="search_box">
@@ -40,7 +53,7 @@
 
       <div class="search_box">
         <span>乘车人姓名：</span>
-        <el-input size="small" clearable v-model="searchData.refund_channel"></el-input>
+        <el-input size="small" clearable v-model="searchData.passenger_name"></el-input>
       </div>
 
       <div class="search_box">
@@ -199,15 +212,23 @@
           label="非自愿附件">
         </el-table-column>
       </el-table>
-      <el-pagination
-        class="main_pagination"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="pageNum"
-        :page-size="pageSize"
-        layout=" prev, pager, next, sizes, jumper"
-        :total="dataList.length">
-      </el-pagination>
+      <div class="table_bottom">
+        <el-pagination
+          class="main_pagination"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-size="pageSize"
+          layout=" prev, pager, next, sizes, jumper"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="dataList.length">
+        </el-pagination>
+
+        <div class="table_setting">
+          <el-button type="primary" size="small" @click="jumpSettingPage">配置</el-button>
+        </div>
+
+      </div>
     </div>
 
     <el-dialog
@@ -260,6 +281,8 @@ export default {
         label: '退票成功'
       }],
 
+      orderName: [], // 渠道名称
+
       dataList: [], // 自动出票数据
 
       channelName: '',  // 渠道名称
@@ -299,7 +322,7 @@ export default {
         delete this.searchData.start_time
         delete this.searchData.end_time
       }
-      this.$axios.post('/refund/query',this.searchData)
+      this.$axios.post('http://192.168.0.36:8000/refund/query',this.searchData)
         .then(res =>{
           console.log(res);
           if(res.data.code === 0){
@@ -335,6 +358,20 @@ export default {
       }
     },
 
+    getChannelList(){
+      let data ={
+        project: ''
+      }
+      this.$axios.post('http://192.168.0.36:8000/config/get',data)
+        .then(res =>{
+          if(res.data.code === 0){
+            this.orderName = res.data.data
+          }else {
+            this.$message.warning(res.data.msg)
+          }
+        })
+    },
+
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
       this.pageSize=val;
@@ -348,10 +385,22 @@ export default {
      * @author Wish
      * @date 2020/3/16
     */
-
     handleSelect(val) {
       this.channelName = val.RefundChannel
-    }
+    },
+
+
+    /**
+     * @Description: 跳转设置页面
+     * @author Wish
+     * @date 2020/3/17
+    */
+    jumpSettingPage(){
+      this.$router.push({
+        path: '/setting'
+      })
+    },
+
 
   },
   filters:{
@@ -362,12 +411,16 @@ export default {
   },
   created() {
     this.getData()
+  },
+  mounted() {
+    this.getChannelList()
   }
 }
 </script>
 
 <style scoped lang="less">
   .index{
+    padding: 20px;
     .search_header{
       display: flex;
       align-items: center;
@@ -404,10 +457,19 @@ export default {
       }
     }
     .main_table{
-
+      .table_bottom{
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-top: 25px;
+      }
+      .table_setting{
+        .el-button{
+          padding: 9px 30px;
+        }
+      }
     }
     .main_pagination{
-      margin-top: 25px;
     }
   }
 /* 渠道名称弹窗 */

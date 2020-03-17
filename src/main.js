@@ -14,6 +14,9 @@ import {
   DatePicker,
   Pagination,
   Dialog,
+  Form,
+  FormItem,
+  MessageBox,
   Message } from 'element-ui';
 
 Vue.use(Button)
@@ -25,13 +28,19 @@ Vue.use(Input)
 Vue.use(DatePicker)
 Vue.use(Pagination)
 Vue.use(Dialog)
+Vue.use(Form)
+Vue.use(FormItem)
 
 Vue.prototype.$message = Message;
+Vue.prototype.$msgbox = MessageBox;
+Vue.prototype.$confirm = MessageBox.confirm;
 
 import axios from "axios";
 Vue.prototype.$axios = axios;
 
 import('../src/utlis/tools')
+
+import('../public/base.less')
 
 new Vue({
   router,
