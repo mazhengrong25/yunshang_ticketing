@@ -37,7 +37,6 @@
       <div class="search_box">
         <span>退票类型：</span>
         <el-select
-          @input="onChang($event)"
           v-model="searchData.refund_type"
           clearable
           size="small"
@@ -99,7 +98,7 @@
       </div>
 
       <div class="search_box">
-        <el-button size="small" @click="getData()">搜索</el-button>
+        <el-button size="small" @click="searchBtn()">搜索</el-button>
       </div>
 
 
@@ -107,12 +106,14 @@
 
     <div class="main_table">
       <el-table
-        :data="dataList | pagination(pageNum,pageSize)"
+        v-el-table-infinite-scroll="load"
+        :data="dataList"
         highlight-current-row
         stripe
+        height="calc(100vh - 250px)"
         border
         @current-change="handleSelect"
-        style="width: 100%">
+        style="width: 100%;">
         <el-table-column
           align="center"
           fixed
@@ -144,16 +145,17 @@
           align="center"
           show-overflow-tooltip
           width="180"
-          prop="PlatformOrderNo"
-          label="平台订单号">
+          prop="YATPOrderNo"
+          label="YATP订单号">
         </el-table-column>
         <el-table-column
           align="center"
           show-overflow-tooltip
           width="180"
-          prop="YATPOrderNo"
-          label="YATP订单号">
+          prop="PlatformOrderNo"
+          label="平台退票订单号">
         </el-table-column>
+
         <el-table-column
           align="center"
           show-overflow-tooltip
@@ -178,15 +180,17 @@
           align="center"
           show-overflow-tooltip
           width="180"
-          prop="RefundReason"
+          prop="RefundMsg"
           label="退票返回消息">
         </el-table-column>
         <el-table-column
           align="center"
           show-overflow-tooltip
           width="200"
-          prop="PassengerInfos"
-          label="乘客及航程信息">
+          label="票号信息">
+          <template slot-scope="scope">
+            <div style="overflow: hidden;text-overflow: ellipsis;cursor: pointer" @click="openTicketMessage(scope.row.TicketNos)">{{scope.row.TicketNos}}</div>
+          </template>
         </el-table-column>
         <el-table-column
           align="center"
@@ -213,19 +217,20 @@
         </el-table-column>
       </el-table>
       <div class="table_bottom">
-        <el-pagination
-          class="main_pagination"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="pageNum"
-          :page-size="pageSize"
-          layout=" prev, pager, next, sizes, jumper"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="dataList.length">
-        </el-pagination>
+<!--        <el-pagination-->
+<!--          class="main_pagination"-->
+<!--          @size-change="handleSizeChange"-->
+<!--          @current-change="handleCurrentChange"-->
+<!--          :current-page="pageNum"-->
+<!--          :page-size="pageSize"-->
+<!--          layout=" prev, pager, next, sizes, jumper"-->
+<!--          :page-sizes="[10, 20, 50, 100]"-->
+<!--          :total="dataList.length">-->
+<!--        </el-pagination>-->
 
         <div class="table_setting">
           <el-button type="primary" size="small" @click="jumpSettingPage">配置</el-button>
+          <el-button size="small" @click="jumpReadme">接口文档</el-button>
         </div>
 
       </div>
@@ -235,7 +240,7 @@
       custom-class="channel_dialog"
       :title="channelName"
       :visible.sync="channelDialog"
-      width="30%">
+      width="500">
       <el-table
         border>
         <el-table-column
@@ -247,17 +252,35 @@
 
     </el-dialog>
 
+
+    <el-dialog
+      custom-class="channel_dialog"
+      title="票号信息"
+      :visible.sync="ticketMessageDialog"
+      width="400px">
+      <div>
+        <div v-for="(item,index) in ticketMessage" :key="index">
+          票号：{{item.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{item.split(',')[1] === '0'? '退款成功': '信息未收录'}}
+        </div>
+      </div>
+
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-
+  import elTableInfiniteScroll from 'el-table-infinite-scroll';
 export default {
   name: 'index',
+  directives: {
+    'el-table-infinite-scroll': elTableInfiniteScroll
+  },
   data(){
     return {
       searchData: {
-        offset: null
+        offset: 0,
+        limit: 20
       },
       orderTime: '',  // 退票申请时间
       orderType: [{  // 退票类型
@@ -288,8 +311,12 @@ export default {
       channelName: '',  // 渠道名称
       channelDialog: false, // 渠道名称弹窗
 
-      pageNum: 1,
-      pageSize:10
+      loadStatus: false,
+
+      ticketMessageDialog: false, // 票号信息弹窗
+      ticketMessage: [], // 票号信息
+      // pageNum: 1,
+      // pageSize:10
     }
   },
   methods:{
@@ -297,6 +324,17 @@ export default {
       this.$forceUpdate()
     },
 
+    load(){
+      if(this.loadStatus){
+        this.searchData.offset = this.searchData.offset + 1
+        this.getData()
+      }
+    },
+    searchBtn(){
+      this.dataList = []
+      this.loadStatus = false
+      this.getData()
+    },
     /**
      * @Description: 退票查询接口
      * @author Wish
@@ -308,7 +346,6 @@ export default {
        * @author Wish
        * @date 2020/3/13
        */
-      console.log(this.orderTime);
       if(this.orderTime){
         let thisDate = new Date().getTime();  // 现在时间
         console.log(thisDate,new Date(this.orderTime[0]).getTime());
@@ -322,11 +359,24 @@ export default {
         delete this.searchData.start_time
         delete this.searchData.end_time
       }
-      this.$axios.post('http://192.168.0.36:8000/refund/query',this.searchData)
+      if(this.searchData.refund_type === ''){
+        delete this.searchData.refund_type
+      }
+      this.$axios.post('http://192.168.0.36:8006/refund/query',this.searchData)
         .then(res =>{
           console.log(res);
           if(res.data.code === 0){
-            this.dataList = res.data.data
+            if(this.loadStatus){
+              if(res.data.data.length> 0){
+                this.dataList = this.dataList.concat(res.data.data)
+              }else {
+                this.loadStatus = false
+                this.$message.warning('暂无更多数据')
+              }
+            }else {
+              this.dataList = res.data.data
+              this.loadStatus = true
+            }
           }else {
             this.$message.error(res.data.message)
           }
@@ -335,6 +385,33 @@ export default {
           console.log(err);
           this.$message.error(err.message)
         })
+    },
+
+    /**
+     * @Description: 跳转接口文档
+     * @author Wish
+     * @date 2020/3/27
+    */
+    jumpReadme(){
+      this.$router.push('/readme')
+    },
+
+
+    /**
+     * @Description: 票号信息
+     * @author Wish
+     * @date 2020/3/30
+    */
+    openTicketMessage(val){
+      if(val.indexOf(';') !== -1){
+        this.ticketMessage = val.split(';')
+      }else if(val !== ''){
+        this.ticketMessage = val
+      }else {
+        return this.$message.warning('暂无数据')
+      }
+      this.ticketMessageDialog = true
+
     },
 
 
@@ -349,7 +426,7 @@ export default {
         let data ={
           project: this.channelName
         }
-        this.$axios.post('/config/get',data)
+        this.$axios.post('http://192.168.0.36:8006/config/get',data)
           .then(res =>{
             console.log(res);
           })
@@ -362,7 +439,7 @@ export default {
       let data ={
         project: ''
       }
-      this.$axios.post('http://192.168.0.36:8000/config/get',data)
+      this.$axios.post('http://192.168.0.36:8006/config/get',data)
         .then(res =>{
           if(res.data.code === 0){
             this.orderName = res.data.data
@@ -372,14 +449,14 @@ export default {
         })
     },
 
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-      this.pageSize=val;
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-      this.pageNum = val;
-    },
+    // handleSizeChange(val) {
+    //   console.log(`每页 ${val} 条`);
+    //   this.pageSize=val;
+    // },
+    // handleCurrentChange(val) {
+    //   console.log(`当前页: ${val}`);
+    //   this.pageNum = val;
+    // },
     /**
      * @Description: 获取渠道名称
      * @author Wish
@@ -460,7 +537,7 @@ export default {
       .table_bottom{
         display: flex;
         align-items: flex-end;
-        justify-content: space-between;
+        justify-content: flex-end;
         margin-top: 25px;
       }
       .table_setting{

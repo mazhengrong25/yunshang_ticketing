@@ -39,8 +39,8 @@
             align="center"
             show-overflow-tooltip
             width="300"
-            prop="channel_name"
-            label="渠道名称">
+            prop="author"
+            label="作者">
           </el-table-column>
           <el-table-column
             fixed="right"
@@ -70,19 +70,20 @@
     </div>
 
     <el-dialog
+      :append-to-body="true"
       custom-class="setting_dialog"
       :title="settingType === 'add'?'新增配置':'编辑配置'"
       :visible.sync="settingDialog"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
-      width="30%">
+      width="500px">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="项目名称" prop="project">
           <el-input v-model="ruleForm.project"></el-input>
         </el-form-item>
         <el-form-item label="请求方式" prop="request_way">
-          <el-select v-model="ruleForm.request_way" placeholder="请选择请求方式">
+          <el-select style="width: 100%" v-model="ruleForm.request_way" placeholder="请选择请求方式">
             <el-option label="mq" value="mq"></el-option>
             <el-option label="http" value="http"></el-option>
           </el-select>
@@ -90,8 +91,8 @@
         <el-form-item label="请求路径" prop="url">
           <el-input v-model="ruleForm.url"></el-input>
         </el-form-item>
-        <el-form-item label="渠道名称" prop="channel_name">
-          <el-input v-model="ruleForm.channel_name"></el-input>
+        <el-form-item label="作者" prop="author">
+          <el-input v-model="ruleForm.author"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="closedDialog('ruleForm')">关闭</el-button>
@@ -129,8 +130,8 @@
           url: [  // 请求路径
             {required: true, message: '请填写请求路径', trigger: 'blur'}
           ],
-          channel_name: [  // 渠道名称
-            {required: true, message: '请填写渠道名称', trigger: 'blur'}
+          author: [  // 渠道名称
+            {required: true, message: '请填写作者名称', trigger: 'blur'}
           ],
         },
 
@@ -146,7 +147,7 @@
        * @date 2020/3/17
       */
       backUrl(){
-        this.$router.go(-1)
+        this.$router.push('/')
       },
 
       /**
@@ -158,7 +159,7 @@
         let data = {
           project: ''
         }
-        this.$axios.post('http://192.168.0.36:8000/config/get',data)
+        this.$axios.post('http://192.168.0.212:8006/config/get',data)
           .then(res =>{
             if(res.data.code === 0){
               this.dataList = res.data.data
@@ -176,13 +177,11 @@
       */
       openSettingDialog(type,val){
         console.log(type,val);
+        console.log(this.settingDialog);
         this.settingType = type
         this.settingDialog = true
-        if(val){
-          this.ruleForm =  JSON.parse(JSON.stringify(val))
-        }else {
-          this.ruleForm = {}
-        }
+        this.ruleForm =  val?JSON.parse(JSON.stringify(val)):{}
+        console.log(this.settingDialog);
       },
 
       /**
@@ -204,8 +203,8 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let url = this.settingType === 'add'? 'http://192.168.0.36:8000/config/set' :
-                      this.settingType === 'edit'? 'http://192.168.0.36:8000/config/update' : ''
+            let url = this.settingType === 'add'? 'http://192.168.0.212:8006/config/set' :
+                      this.settingType === 'edit'? 'http://192.168.0.212:8006/config/update' : ''
             this.$axios.post(url,this.ruleForm)
               .then(res =>{
                 console.log(res);
@@ -238,7 +237,7 @@
           let data = {
             project: val.project
           }
-          this.$axios.post('http://192.168.0.36:8000/config/del',data)
+          this.$axios.post('http://192.168.0.212:8006/config/del',data)
             .then(res =>{
               console.log(res);
               if(res.data.code === 0){

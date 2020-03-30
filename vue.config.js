@@ -21,7 +21,7 @@ module.exports = {
   // console移除
   configureWebpack(config) {
     if (process.env.NODE_ENV === 'production') {
-      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
+      // config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
     }
   },
   css: {
@@ -34,11 +34,11 @@ module.exports = {
     // 启用 CSS requireModuleExtension for all css / pre-processor files.
     requireModuleExtension: false
   },
-  publicPath: './',
+  publicPath: './dist/',
   productionSourceMap: false,
   devServer: {
     disableHostCheck:true,
-    proxy: 'http://192.168.0.36:8000',
+    proxy: 'http://192.168.0.36:8006',
     // changeOrigin: true,
     // overlay: {
     //   errors: true,
