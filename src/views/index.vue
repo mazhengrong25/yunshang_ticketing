@@ -259,8 +259,11 @@
       :visible.sync="ticketMessageDialog"
       width="400px">
       <div>
-        <div v-for="(item,index) in ticketMessage" :key="index">
+        <div v-for="(item,index) in ticketMessageList" :key="index">
           票号：{{item.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{item.split(',')[1] === '0'? '退款成功': '信息未收录'}}
+        </div>
+        <div v-if="ticketMessage">
+          票号：{{ticketMessage.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{ticketMessage.split(',')[1] === '0'? '退款成功': '信息未收录'}}
         </div>
       </div>
 
@@ -314,7 +317,8 @@ export default {
       loadStatus: false,
 
       ticketMessageDialog: false, // 票号信息弹窗
-      ticketMessage: [], // 票号信息
+      ticketMessageList: [], // 票号信息列表
+      ticketMessage: '', // 票号信息
       // pageNum: 1,
       // pageSize:10
     }
@@ -404,9 +408,11 @@ export default {
     */
     openTicketMessage(val){
       if(val.indexOf(';') !== -1){
-        this.ticketMessage = val.split(';')
+        this.ticketMessageList = val.split(';')
+        this.ticketMessage = ''
       }else if(val !== ''){
         this.ticketMessage = val
+        this.ticketMessageList = []
       }else {
         return this.$message.warning('暂无数据')
       }

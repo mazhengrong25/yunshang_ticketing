@@ -34,7 +34,7 @@ module.exports = {
     // 启用 CSS requireModuleExtension for all css / pre-processor files.
     requireModuleExtension: false
   },
-  publicPath: './dist/',
+  publicPath: process.env.NODE_ENV === 'production'? './dist/': './',
   productionSourceMap: false,
   devServer: {
     disableHostCheck:true,

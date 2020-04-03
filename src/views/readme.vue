@@ -3,7 +3,7 @@
     <div class="header">
       <router-link class="back_btn" to="/"><i class="el-icon-arrow-left"></i>返回</router-link>
     </div>
-    <markdown-preview :initialValue="markDown"></markdown-preview>
+    <markdown-preview class="markdown_preview" :initialValue="markDown"></markdown-preview>
   </div>
 </template>
 
@@ -52,5 +52,9 @@
         margin-right: 10px;
       }
     }
+  }
+  .markdown_preview{
+    max-width: 900px;
+    margin: 0 auto;
   }
 </style>
