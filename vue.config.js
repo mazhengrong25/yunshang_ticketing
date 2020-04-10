@@ -37,8 +37,8 @@ module.exports = {
   publicPath: process.env.NODE_ENV === 'production'? './dist/': './',
   productionSourceMap: false,
   devServer: {
-    disableHostCheck:true,
-    proxy: 'http://192.168.0.36:8006',
+    // disableHostCheck:true,
+    proxy: 'http://192.168.0.176:8006',
     // changeOrigin: true,
     // overlay: {
     //   errors: true,

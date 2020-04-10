@@ -1,5 +1,8 @@
 <template>
   <div class="index">
+
+    <div class="drawer_btn" @mouseenter="openDrawer"></div>
+
     <div class="search_header">
       <div class="search_box">
         <span>渠道名称：</span>
@@ -49,6 +52,8 @@
           </el-option>
         </el-select>
       </div>
+    </div>
+    <div class="search_header">
 
       <div class="search_box">
         <span>乘车人姓名：</span>
@@ -100,8 +105,6 @@
       <div class="search_box">
         <el-button size="small" @click="searchBtn()">搜索</el-button>
       </div>
-
-
     </div>
 
     <div class="main_table">
@@ -110,111 +113,112 @@
         :data="dataList"
         highlight-current-row
         stripe
-        height="calc(100vh - 250px)"
+        height="calc(100vh - 140px)"
         border
         @current-change="handleSelect"
         style="width: 100%;">
-        <el-table-column
+        <ex-table-column
+          :autoFit="true"
           align="center"
           fixed
           show-overflow-tooltip
-          width="110"
           prop="RefundChannel"
           label="退票渠道">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="130"
           prop="ChannelType"
           label="渠道类型">
-        </el-table-column>
-<!--        <el-table-column-->
+        </ex-table-column>
+<!--        <ex-table-column-->
 <!--          align="center"-->
 <!--          prop="ShopName"-->
 <!--          label="店铺名称">-->
-<!--        </el-table-column>-->
-        <el-table-column
+<!--        </ex-table-column>-->
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="220"
           prop="OperateDepartment"
           label="运营部门">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="180"
           prop="YATPOrderNo"
           label="YATP订单号">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="180"
           prop="PlatformOrderNo"
           label="平台退票订单号">
-        </el-table-column>
+        </ex-table-column>
 
-        <el-table-column
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="90"
           prop="RefundType"
           label="退票类型">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="90"
           prop="RefundStatus"
           label="退票状态">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
           prop="RefundReason"
           label="退票原因">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="180"
           prop="RefundMsg"
           label="退票返回消息">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="200"
           label="票号信息">
           <template slot-scope="scope">
             <div style="overflow: hidden;text-overflow: ellipsis;cursor: pointer" @click="openTicketMessage(scope.row.TicketNos)">{{scope.row.TicketNos}}</div>
           </template>
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="180"
           prop="RefundAccout"
           label="退票帐号">
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="150"
           label="退票申请时间">
           <template slot-scope="scope">
             {{$getTime(scope.row.RefundTime)}}
           </template>
-        </el-table-column>
-        <el-table-column
+        </ex-table-column>
+        <ex-table-column
           align="center"
+          :autoFit="true"
           show-overflow-tooltip
-          width="120"
           prop="Attachment"
           label="非自愿附件">
-        </el-table-column>
+        </ex-table-column>
       </el-table>
       <div class="table_bottom">
 <!--        <el-pagination-->
@@ -229,8 +233,7 @@
 <!--        </el-pagination>-->
 
         <div class="table_setting">
-          <el-button type="primary" size="small" @click="jumpSettingPage">配置</el-button>
-          <el-button size="small" @click="jumpReadme">接口文档</el-button>
+
         </div>
 
       </div>
@@ -243,11 +246,11 @@
       width="500">
       <el-table
         border>
-        <el-table-column
+        <ex-table-column
           align="center"
           prop="channel_name"
           label="渠道名称">
-        </el-table-column>
+        </ex-table-column>
       </el-table>
 
     </el-dialog>
@@ -269,6 +272,24 @@
 
     </el-dialog>
 
+
+    <el-drawer
+      title="我是标题"
+      append-to-body
+      size="300px"
+      :visible.sync="drawer"
+      direction="ltr"
+      :with-header="false">
+      <div class="drawer_main">
+        <div class="logo"><img src="../assets/logo.png" alt=""></div>
+        <div class="drawer_box">
+          <div class="drawer_btn" @click="jumpRouter('/setting')">配置</div>
+          <div class="drawer_btn" @click="jumpRouter('/statistics')">退票统计</div>
+          <div class="drawer_btn" @click="jumpRouter('/readme')">接口文档</div>
+        </div>
+      </div>
+    </el-drawer>
+
   </div>
 </template>
 
@@ -281,6 +302,8 @@ export default {
   },
   data(){
     return {
+      drawer: false,  // 菜单
+
       searchData: {
         offset: 0,
         limit: 20
@@ -330,7 +353,7 @@ export default {
 
     load(){
       if(this.loadStatus){
-        this.searchData.offset = this.searchData.offset + 1
+        this.searchData.offset = this.searchData.offset + this.searchData.limit + 1
         this.getData()
       }
     },
@@ -339,6 +362,17 @@ export default {
       this.loadStatus = false
       this.getData()
     },
+
+    /**
+     * @Description: 打开侧边框
+     * @author Wish
+     * @date 2020/4/10
+    */
+    openDrawer(){
+      this.drawer = true
+    },
+
+
     /**
      * @Description: 退票查询接口
      * @author Wish
@@ -366,7 +400,7 @@ export default {
       if(this.searchData.refund_type === ''){
         delete this.searchData.refund_type
       }
-      this.$axios.post('http://192.168.0.36:8006/refund/query',this.searchData)
+      this.$axios.post('/refund/query',this.searchData)
         .then(res =>{
           console.log(res);
           if(res.data.code === 0){
@@ -396,8 +430,8 @@ export default {
      * @author Wish
      * @date 2020/3/27
     */
-    jumpReadme(){
-      this.$router.push('/readme')
+    jumpRouter(url){
+      this.$router.push(url)
     },
 
 
@@ -432,7 +466,7 @@ export default {
         let data ={
           project: this.channelName
         }
-        this.$axios.post('http://192.168.0.36:8006/config/get',data)
+        this.$axios.post('/config/get',data)
           .then(res =>{
             console.log(res);
           })
@@ -445,7 +479,7 @@ export default {
       let data ={
         project: ''
       }
-      this.$axios.post('http://192.168.0.36:8006/config/get',data)
+      this.$axios.post('/config/get',data)
         .then(res =>{
           if(res.data.code === 0){
             this.orderName = res.data.data
@@ -473,18 +507,6 @@ export default {
     },
 
 
-    /**
-     * @Description: 跳转设置页面
-     * @author Wish
-     * @date 2020/3/17
-    */
-    jumpSettingPage(){
-      this.$router.push({
-        path: '/setting'
-      })
-    },
-
-
   },
   filters:{
     pagination(dataList,pageNum,pageSize){
@@ -504,10 +526,29 @@ export default {
 <style scoped lang="less">
   .index{
     padding: 20px;
+    position: relative;
+    .drawer_btn{
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 20px;
+      animation: showDrawer 4s infinite ease-in-out alternate 1s;
+      background: linear-gradient(to right, rgba(0, 123, 255, 0.3), #fff);
+      opacity: 0;
+    }
+    @keyframes showDrawer{
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
     .search_header{
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
+      /*flex-wrap: wrap;*/
       .search_box{
         display: inline-flex;
         align-items: center;
@@ -540,17 +581,17 @@ export default {
       }
     }
     .main_table{
-      .table_bottom{
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-end;
-        margin-top: 25px;
-      }
-      .table_setting{
-        .el-button{
-          padding: 9px 30px;
-        }
-      }
+      /*.table_bottom{*/
+      /*  display: flex;*/
+      /*  align-items: flex-end;*/
+      /*  justify-content: flex-end;*/
+      /*  margin-top: 25px;*/
+      /*}*/
+      /*.table_setting{*/
+      /*  .el-button{*/
+      /*    padding: 9px 30px;*/
+      /*  }*/
+      /*}*/
     }
     .main_pagination{
     }
@@ -561,5 +602,40 @@ export default {
       max-height: 800px;
       overflow-y: auto;
     }
+  }
+  .drawer_main{
+    padding: 20px;
+    .logo{
+      width: 100%;
+      height: 40px;
+      >img{
+
+        height: 100%;
+        object-fit: contain;
+      }
+      margin-bottom: 15px;
+    }
+    .drawer_box{
+      &:hover{
+        .drawer_btn:not(:hover){
+          color: rgba(0,0,0,.4);
+        }
+      }
+      .drawer_btn{
+        width: 100%;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: rgba(0,0,0,1);
+
+        &:not(:last-child){
+          margin-bottom: 5px;
+          border-bottom: 1px solid #c1c1c1;
+        }
+      }
+    }
+
   }
 </style>

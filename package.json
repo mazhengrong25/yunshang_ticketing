@@ -12,6 +12,8 @@
     "core-js": "^3.6.4",
     "el-table-infinite-scroll": "^1.0.10",
     "element-ui": "^2.13.0",
+    "ex-table-column": "^1.0.7",
+    "pl-table": "^2.5.8",
     "vue": "^2.6.11",
     "vue-meditor": "^2.1.1",
     "vue-router": "^3.1.5",

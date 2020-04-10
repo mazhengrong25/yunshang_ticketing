@@ -16,6 +16,7 @@ import {
   Dialog,
   Form,
   FormItem,
+  Drawer,
   MessageBox,
   Message } from 'element-ui';
 
@@ -30,10 +31,14 @@ Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Form)
 Vue.use(FormItem)
+Vue.use(Drawer)
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;
 Vue.prototype.$confirm = MessageBox.confirm;
+
+import ExTableColumn from 'ex-table-column';
+Vue.component(ExTableColumn.name, ExTableColumn);
 
 import axios from "axios";
 Vue.prototype.$axios = axios;
