@@ -4,7 +4,15 @@
       <router-link class="back_btn" to="/"><i class="el-icon-arrow-left"></i>返回</router-link>
     </div>
 
+    <div class="search_box">
 
+
+
+    </div>
+    <div class="ticketing_charts">
+
+
+    </div>
   </div>
 </template>
 

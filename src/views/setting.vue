@@ -11,9 +11,10 @@
 
       <div class="setting_table">
         <el-table
-          :data="dataList | pagination(pageNum,pageSize)"
+          :data="dataList"
           stripe
           border
+          highlight-current-row
           style="width: 100%">
           <el-table-column
             align="center"
@@ -24,7 +25,7 @@
           </el-table-column>
           <el-table-column
             align="center"
-            width="200"
+            width="100"
             show-overflow-tooltip
             prop="request_way"
             label="请求方式">
@@ -38,7 +39,13 @@
           <el-table-column
             align="center"
             show-overflow-tooltip
-            width="300"
+            prop="exchange_name"
+            label="交换机名">
+          </el-table-column>
+          <el-table-column
+            align="center"
+            show-overflow-tooltip
+            width="200"
             prop="author"
             label="作者">
           </el-table-column>
@@ -54,17 +61,6 @@
           </el-table-column>
 
         </el-table>
-
-        <el-pagination
-          class="main_pagination"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="pageNum"
-          :page-size="pageSize"
-          layout=" prev, pager, next, sizes, jumper"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="dataList.length">
-        </el-pagination>
       </div>
 
     </div>
@@ -137,7 +133,7 @@
 
 
         pageNum: 1,
-        pageSize:10,
+        pageSize:20,
       }
     },
     methods:{
@@ -159,7 +155,7 @@
         let data = {
           project: ''
         }
-        this.$axios.post('http://192.168.0.212:8006/config/get',data)
+        this.$axios.post('/config/get',data)
           .then(res =>{
             if(res.data.code === 0){
               this.dataList = res.data.data
@@ -203,8 +199,8 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let url = this.settingType === 'add'? 'http://192.168.0.212:8006/config/set' :
-                      this.settingType === 'edit'? 'http://192.168.0.212:8006/config/update' : ''
+            let url = this.settingType === 'add'? '/config/set' :
+                      this.settingType === 'edit'? '/config/update' : ''
             this.$axios.post(url,this.ruleForm)
               .then(res =>{
                 console.log(res);
@@ -237,7 +233,7 @@
           let data = {
             project: val.project
           }
-          this.$axios.post('http://192.168.0.212:8006/config/del',data)
+          this.$axios.post('/config/del',data)
             .then(res =>{
               console.log(res);
               if(res.data.code === 0){
@@ -251,31 +247,31 @@
       },
 
 
-      /**
-       * @Description: 分页器
-       * @author Wish
-       * @date 2020/3/17
-      */
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
-        this.pageSize=val;
-      },
-      handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
-        this.pageNum = val;
-      },
+      // /**
+      //  * @Description: 分页器
+      //  * @author Wish
+      //  * @date 2020/3/17
+      // */
+      // handleSizeChange(val) {
+      //   console.log(`每页 ${val} 条`);
+      //   this.pageSize=val;
+      // },
+      // handleCurrentChange(val) {
+      //   console.log(`当前页: ${val}`);
+      //   this.pageNum = val;
+      // },
 
     },
     created() {
       this.getDataList()
     },
 
-    filters:{
-      pagination(dataList,pageNum,pageSize){
-        let offset = (pageNum - 1) * pageSize;//当前页第一条的索引
-        return (offset + pageSize >= dataList.length) ? dataList.slice(offset, dataList.length) : dataList.slice(offset, offset + pageSize)
-      }
-    },
+    // filters:{
+    //   pagination(dataList,pageNum,pageSize){
+    //     let offset = (pageNum - 1) * pageSize;//当前页第一条的索引
+    //     return (offset + pageSize >= dataList.length) ? dataList.slice(offset, dataList.length) : dataList.slice(offset, offset + pageSize)
+    //   }
+    // },
   }
 </script>
 
