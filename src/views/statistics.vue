@@ -58,21 +58,24 @@
         <el-button size="small" @click="getData">搜索</el-button>
       </div>
       <div class="ticketing_charts">
-        <v-chart :data="dataList"/>
+        <div style="height: 500px;width: 100%" id="myChart"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import ECharts from 'vue-echarts'
-  import 'echarts/lib/chart/line'
+  let echarts = require("echarts/lib/echarts");
+  // 引入柱状图组件
+  require("echarts/lib/chart/line");
+  // 引入提示框和title组件
+  require("echarts/lib/component/tooltip");
+  require("echarts/lib/component/title");
+  require("echarts/lib/component/dataZoom");
 
   export default {
     name: "statistics",
-    components:{
-      'v-chart': ECharts
-    },
+
     data(){
       return {
         orderName: [], // 渠道列表
@@ -82,22 +85,64 @@
 
         StartTime: '',
         EndTime: '',
-        dataList: {},  // 图表数据
-
-        // option: {
-        //   series: [
-        //     {
-        //       name: 'line',
-        //       type: 'line',
-        //       data: this.dataList
-        //     }
-        //   ],
-        // }
+        dataListName: [],  // 图表数据
+        dataList: [],
+        dataListNot: [],
+        chartsTitle: '', // 图表title
       }
     },
     methods:{
       onChang(e){
         this.$forceUpdate()
+      },
+
+      drawLine() {
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = echarts.init(document.getElementById('myChart'))
+        // 绘制图表
+        myChart.setOption({
+          tooltip: {
+            trigger: 'axis'
+          },
+          title: {
+            text: this.chartsTitle
+          },
+          grid: {  // 图表属性
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          dataZoom: [{  // 缩放
+            id: 'dataZoomX',
+            type:"inside",
+            xAxisIndex: [0],
+            filterMode: 'filter'
+          }],
+          toolbox: {  // 控制条
+            show: true,
+            feature: {
+              saveAsImage: {},
+            }
+          },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: this.dataListName
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [{
+            name: '自愿',
+            type: 'line',
+            data: this.dataList
+          },{
+            name: '非自愿',
+            type: 'line',
+            data: this.dataListNot
+          }]
+        });
       },
 
       /**
@@ -116,30 +161,44 @@
         this.$axios.post('/query/statisticsData',JSON.stringify(data))
           .then(res =>{
             if(res.data.Code === 0){
+              console.log(res.data.Data);
               let dataListArr = []
-              let dataList
+              let dataList = []
               if(this.ChannelNameLst.length > 1){
                 this.ChannelNameLst.forEach((item, index) =>{
                   dataListArr.push(res.data.Data[this.ChannelNameLst[index].toString()][this.QueryType])
                 })
               }else {
-                console.log(res.data.Data[this.ChannelNameLst.toString()][this.QueryType]);
                 dataList = res.data.Data[this.ChannelNameLst.toString()][this.QueryType]
               }
-              console.log(dataListArr);
+              this.chartsTitle = Object.keys(res.data.Data).toString()
+              console.log(this.chartsTitle);
               this.$message.success(res.data.Msg)
+              this.dataList = []
+              this.dataListName = []
+              this.dataListNot = []
               console.log(dataList);
-              this.dataList['row'] = []
-              // this.dataList['columns'] = ['日期']
-
               for(let item in dataList) {
-                this.dataList.row.push({
-                  'name': item,
-                  'value': dataList[item],
-                })
+                this.dataListName.push(item)
+
+                for(let oitem in dataList[item]){
+                  if(oitem === '非自愿'){
+                    this.dataListNot.push(dataList[item][oitem])
+                  }else if(oitem === '自愿'){
+                    this.dataList.push(dataList[item][oitem])
+                  }else {
+                    this.dataListNot.push(0)
+                    this.dataList.push(0)
+                  }
+                }
               }
 
               console.log(this.dataList);
+              console.log(this.dataListNot);
+              console.log(this.dataListName);
+
+              this.drawLine();
+
             }else {
               this.$message.warning(res.data.msg)
             }
@@ -196,6 +255,7 @@
       .search_header{
         display: flex;
         align-items: center;
+        margin-bottom: 20px;
         .search_box{
           display: inline-flex;
           align-items: center;
