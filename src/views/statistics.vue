@@ -58,7 +58,7 @@
         <el-button size="small" @click="getData">搜索</el-button>
       </div>
       <div class="ticketing_charts">
-        <div style="height: 500px;width: 100%" id="myChart"></div>
+        <div style="height: 100%;width: 100%" id="myChart"></div>
       </div>
     </div>
   </div>
@@ -66,12 +66,15 @@
 
 <script>
   let echarts = require("echarts/lib/echarts");
-  // 引入柱状图组件
+  // 引入组件
   require("echarts/lib/chart/line");
+  require("echarts/lib/chart/bar");
   // 引入提示框和title组件
   require("echarts/lib/component/tooltip");
   require("echarts/lib/component/title");
   require("echarts/lib/component/dataZoom");
+  require("echarts/lib/component/legend");
+  require("echarts/lib/component/toolbox");
 
   export default {
     name: "statistics",
@@ -86,9 +89,14 @@
         StartTime: '',
         EndTime: '',
         dataListName: [],  // 图表数据
+        dataName: [], // 数据名列表
         dataList: [],
         dataListNot: [],
+        dataListError: [],
+        dataListVol: [],
         chartsTitle: '', // 图表title
+
+        chartsType: 'line', // 图表类型
       }
     },
     methods:{
@@ -96,6 +104,11 @@
         this.$forceUpdate()
       },
 
+      /**
+       * @Description: 折线图属性
+       * @author Wish
+       * @date 2020/4/16
+      */
       drawLine() {
         // 基于准备好的dom，初始化echarts实例
         let myChart = echarts.init(document.getElementById('myChart'))
@@ -106,6 +119,12 @@
           },
           title: {
             text: this.chartsTitle
+          },
+          legend: {
+            data: this.dataName,
+            orient: 'horizontal',
+            // x 设置水平安放位置，默认全图居中，可选值：'center' ¦ 'left' ¦ 'right' ¦ {number}（x坐标，单位px）
+
           },
           grid: {  // 图表属性
             left: '3%',
@@ -134,14 +153,107 @@
             type: 'value'
           },
           series: [{
-            name: '自愿',
-            type: 'line',
+            name: this.dataName[0],
+            type: this.chartsType,
+            data: this.dataListNot
+          },{
+            name: this.dataName[1],
+            type: this.chartsType,
             data: this.dataList
           },{
-            name: '非自愿',
-            type: 'line',
-            data: this.dataListNot
-          }]
+            name: this.dataName[2],
+            type: this.chartsType,
+            data: this.dataListError
+          }],
+        });
+      },
+
+
+      /**
+       * @Description: 柱状图属性
+       * @author Wish
+       * @date 2020/4/16
+       */
+      drawBar() {
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = echarts.init(document.getElementById('myChart'))
+        // 绘制图表
+        myChart.setOption({
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+              type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+          },
+          title: {
+            text: this.chartsTitle
+          },
+          legend: {
+            data: this.dataName,
+          },
+          grid: {  // 图表属性
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          // dataZoom: [{  // 缩放
+          //   id: 'dataZoomX',
+          //   type:"inside",
+          //   xAxisIndex: [0],
+          //   filterMode: 'filter'
+          // }],
+          toolbox: {  // 控制条
+            show: true,
+            feature: {
+              saveAsImage: {},
+            }
+          },
+          xAxis: {
+            // type: 'value'
+          },
+          yAxis: {
+            type: 'category',
+            // boundaryGap: false,
+            data: this.dataListName
+          },
+          series: [{
+            name: this.dataName[0],
+            type: this.chartsType,
+            data: this.dataListNot,
+            stack: "总量",
+            label: {
+              show: true,
+              position: 'insideRight'
+            },
+          },{
+            name: this.dataName[1],
+            type: this.chartsType,
+            data: this.dataList,
+            stack: "总量",
+            label: {
+              show: true,
+              position: 'insideRight'
+            },
+          },{
+            name: this.dataName[2],
+            type: this.chartsType,
+            data: this.dataListError,
+            stack: "总量",
+            label: {
+              show: true,
+              position: 'insideRight'
+            },
+          },{
+            name: this.dataName[3],
+            type: this.chartsType,
+            data: this.dataListVol,
+            stack: "总量",
+            label: {
+              show: true,
+              position: 'insideRight'
+            },
+          }],
         });
       },
 
@@ -150,8 +262,8 @@
        * @author Wish
        * @date 2020/4/14
       */
-
       getData(){
+        echarts.init(document.getElementById('myChart')).dispose();
         let data ={
           ChannelNameLst: this.ChannelNameLst,
           StartTime: new Date(this.orderTime[0]).toISOString(),
@@ -161,49 +273,179 @@
         this.$axios.post('/query/statisticsData',JSON.stringify(data))
           .then(res =>{
             if(res.data.Code === 0){
-              console.log(res.data.Data);
+              this.$message.success(res.data.Msg)
               let dataListArr = []
               let dataList = []
-              if(this.ChannelNameLst.length > 1){
-                this.ChannelNameLst.forEach((item, index) =>{
-                  dataListArr.push(res.data.Data[this.ChannelNameLst[index].toString()][this.QueryType])
-                })
-              }else {
-                dataList = res.data.Data[this.ChannelNameLst.toString()][this.QueryType]
-              }
-              this.chartsTitle = Object.keys(res.data.Data).toString()
-              console.log(this.chartsTitle);
-              this.$message.success(res.data.Msg)
+              let barArr = []
+
               this.dataList = []
+              this.dataName = []
               this.dataListName = []
               this.dataListNot = []
-              console.log(dataList);
-              for(let item in dataList) {
-                this.dataListName.push(item)
+              this.dataListError = []
+              this.dataListVol = []
 
-                for(let oitem in dataList[item]){
-                  if(oitem === '非自愿'){
-                    this.dataListNot.push(dataList[item][oitem])
-                  }else if(oitem === '自愿'){
-                    this.dataList.push(dataList[item][oitem])
-                  }else {
-                    this.dataListNot.push(0)
-                    this.dataList.push(0)
+              this.chartsTitle = Object.keys(res.data.Data).toString()  // 图表标题
+
+              if(this.ChannelNameLst.length > 1){
+                /**
+                 * @Description: 多条数据图表
+                 * @author Wish
+                 * @date 2020/4/16
+                 */
+                this.chartsType = 'bar'
+                for(let item in res.data.Data) {
+                  dataListArr.push(res.data.Data[item][this.QueryType])
+                  this.dataListName.push(item)
+                }
+
+
+                console.log(this.dataListName);
+                console.log(dataListArr);
+
+                if(this.QueryType === 'RefundType') {  // 退票类型数据处理
+                  dataListArr.map((item ,index) =>{
+                    console.log(JSON.stringify(item));
+                    item['自愿'] = item['自愿']? item['自愿']: 0
+                    item['自愿退票'] = item['自愿退票']? item['自愿退票']: 0
+                    item['非自愿'] = item['非自愿']? item['非自愿']: 0
+                    item['非自愿退票'] = item['非自愿退票']? item['非自愿退票']: 0
+                  })
+
+                  this.dataName = ['非自愿','自愿','非自愿退票','自愿退票']
+
+                  for (let index in this.dataListName){
+                    console.log(JSON.stringify(dataListArr[index]));
+                    // if(dataListArr[index]){}
+                    for(let val in dataListArr[index]) {
+                      console.log(val);
+                      console.log(dataListArr[index][val]);
+                      if(val === '非自愿'){
+                        this.dataListNot.push(dataListArr[index][val])
+                      }else if(val === '自愿'){
+                        this.dataList.push(dataListArr[index][val])
+                      }else if(val === '非自愿退票'){
+                        this.dataListError.push(dataListArr[index][val])
+                      }else if(val === '自愿退票'){
+                        this.dataListVol.push(dataListArr[index][val])
+                      }else {
+                        this.dataListNot.push(0)
+                        this.dataList.push(0)
+                        this.dataListError.push(0)
+                        this.dataListVol.push(0)
+                      }
+                    }
+                  }
+                }else if(this.QueryType === 'RefundMsg'){  // 退票返回信息
+
+                }else if(this.QueryType === 'RefundStatus'){  // 退票状态
+                  console.log(dataListArr);
+                  dataListArr.map((item ,index) =>{
+                    barArr.push({
+                      '未提交' : dataListArr[index]['未提交']? dataListArr[index]['未提交']: 0,
+                      '退票失败' : dataListArr[index]['退票失败']? dataListArr[index]['退票失败']: 0,
+                      '退票成功' : dataListArr[index]['退票成功']? dataListArr[index]['退票成功']: 0
+                    })
+                  })
+                  console.log(barArr);
+                  this.dataName = ['未提交','退票失败','退票成功']
+
+                  for (let index in this.dataListName){
+                    console.log(JSON.stringify(barArr[index]));
+                    // if(dataListArr[index]){}
+                    for(let val in barArr[index]) {
+                      console.log(val);
+                      console.log(barArr[index][val]);
+                      if(val === '未提交'){
+                        this.dataListNot.push(barArr[index][val])
+                      }else if(val === '退票失败'){
+                        this.dataList.push(barArr[index][val])
+                      }else if(val === '退票成功'){
+                        this.dataListError.push(barArr[index][val])
+                      }else {
+                        this.dataListNot.push(0)
+                        this.dataList.push(0)
+                        this.dataListError.push(0)
+                      }
+                    }
                   }
                 }
+
+
+                console.log(this.dataName);
+                console.log(this.dataListName);
+                console.log(this.dataList);
+                console.log(this.dataListNot);
+                console.log(this.dataListError);
+                console.log(this.dataListVol);
+                this.drawBar()
+              }else {
+                /**
+                 * @Description: 单条数据图表
+                 * @author Wish
+                 * @date 2020/4/16
+                 */
+                dataList = res.data.Data[this.ChannelNameLst.toString()][this.QueryType]
+
+                this.chartsType = 'line'
+                console.log(dataList);
+                for(let item in dataList) {
+                  this.dataListName.push(item)
+
+                  for(let oitem in dataList[item]){
+                    if(this.QueryType === 'RefundType'){  // 退票类型数据处理
+                      this.dataName = ['非自愿','自愿']
+                      if(oitem === '非自愿'){
+                        this.dataListNot.push(dataList[item][oitem])
+                      }else if(oitem === '自愿'){
+                        this.dataList.push(dataList[item][oitem])
+                      }else {
+                        this.dataListNot.push(0)
+                        this.dataList.push(0)
+                      }
+                    }else if(this.QueryType === 'RefundMsg'){  // 退票返回信息
+                      console.log(oitem);
+                      this.dataName = ['国际自愿退票暂不支持','退票操作成功','票号不存在']
+                      if(oitem === '国际自愿退票暂不支持'){
+                        this.dataListNot.push(dataList[item][oitem])
+                      }else if(oitem === '退票操作成功'){
+                        this.dataList.push(dataList[item][oitem])
+                      }else if(oitem === '票号不存在'){
+                        this.dataListError.push(dataList[item][oitem])
+                      }else {
+                        this.dataListNot.push(0)
+                        this.dataList.push(0)
+                        this.dataListError.push(0)
+                      }
+                    }else if(this.QueryType === 'RefundStatus'){  // 退票状态
+                      console.log(oitem);
+                      this.dataName = ['退票失败','退票成功']
+                      if(oitem === '退票失败'){
+                        this.dataListNot.push(dataList[item][oitem])
+                      }else if(oitem === '退票成功'){
+                        this.dataList.push(dataList[item][oitem])
+                      }else {
+                        this.dataListNot.push(0)
+                        this.dataList.push(0)
+                      }
+                    }
+
+                  }
+                }
+
+                console.log(this.dataList);
+                console.log(this.dataListNot);
+                console.log(this.dataListError);
+                console.log(this.dataListName);
+
+                this.drawLine();  // 折线图
               }
-
-              console.log(this.dataList);
-              console.log(this.dataListNot);
-              console.log(this.dataListName);
-
-              this.drawLine();
-
             }else {
               this.$message.warning(res.data.msg)
             }
           })
       },
+
       /**
        * @Description: 获取渠道名称
        * @author Wish
@@ -254,7 +496,7 @@
       padding: 20px;
       .search_header{
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 20px;
         .search_box{
           display: inline-flex;
@@ -265,6 +507,11 @@
             margin-right: 10px;
           }
         }
+      }
+      .ticketing_charts{
+        width: 100%;
+        height: calc(100vh - 155px);
+        min-height: 500px;
       }
     }
   }
