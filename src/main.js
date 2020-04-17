@@ -17,6 +17,7 @@ import {
   Form,
   FormItem,
   Drawer,
+  OptionGroup,
   MessageBox,
   Message } from 'element-ui';
 
@@ -32,6 +33,7 @@ Vue.use(Dialog)
 Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Drawer)
+Vue.use(OptionGroup)
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;

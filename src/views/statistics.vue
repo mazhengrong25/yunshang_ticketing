@@ -6,27 +6,34 @@
 
     <div class="statistics_main">
       <div class="search_header">
-        <div class="search_box">
+        <div class="search_box" style="flex: 1;max-width: 500px">
           <span class="search_title">渠道查询</span>
           <el-select
+            style="flex: 1"
             @input="onChang($event)"
             v-model="ChannelNameLst"
             clearable
             multiple
             size="small"
             placeholder="请选择">
-            <el-option
-              v-for="item in orderName"
-              :key="item.ID"
-              :label="item.channel_name"
-              :value="item.channel_name">
-            </el-option>
+            <el-option-group label="勾选全部">
+              <el-option label="全部渠道" value="全部渠道"></el-option>
+            </el-option-group>
+            <el-option-group label="渠道列表">
+              <el-option
+                v-for="item in orderName"
+                :key="item.ID"
+                :label="item.channel_name"
+                :value="item.channel_name">
+              </el-option>
+            </el-option-group>
           </el-select>
         </div>
 
         <div class="search_box">
           <span class="search_title">查询类型</span>
           <el-select
+            style="width: 160px"
             @input="onChang($event)"
             v-model="QueryType"
             clearable
@@ -43,6 +50,7 @@
           <span class="search_title">查询时间</span>
           <el-date-picker
             size="small"
+            style="width: 320px"
             clearable
             @input="onChang($event)"
             v-model="orderTime"
@@ -75,6 +83,7 @@
   require("echarts/lib/component/dataZoom");
   require("echarts/lib/component/legend");
   require("echarts/lib/component/toolbox");
+  require("echarts/lib/component/axisPointer");
 
   export default {
     name: "statistics",
@@ -95,6 +104,8 @@
         dataListError: [],
         dataListVol: [],
         chartsTitle: '', // 图表title
+
+        barSliderType: 100, // 柱状图滚动条
 
         chartsType: 'line', // 图表类型
       }
@@ -185,9 +196,9 @@
               type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
             }
           },
-          title: {
-            text: this.chartsTitle
-          },
+          // title: {
+          //   text: this.chartsTitle
+          // },
           legend: {
             data: this.dataName,
           },
@@ -197,12 +208,20 @@
             bottom: '3%',
             containLabel: true
           },
-          // dataZoom: [{  // 缩放
-          //   id: 'dataZoomX',
-          //   type:"inside",
-          //   xAxisIndex: [0],
-          //   filterMode: 'filter'
-          // }],
+
+          dataZoom : [{
+            type: 'slider',
+            filterMode: 'filter',
+            show: this.barSliderType !== 100,
+            yAxisIndex: [0],
+            right: '2%',
+            top: 0,
+            start: 0,
+            end: this.barSliderType, //初始化滚动条
+            startValue:10,                           //数据窗口范围的起始数值
+            endValue:100,
+          }],
+
           toolbox: {  // 控制条
             show: true,
             feature: {
@@ -224,7 +243,14 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight'
+              position: 'insideRight',
+              formatter: function (params) {
+                if (params.value > 0) {
+                  return params.value;
+                } else {
+                  return '';
+                }
+              },
             },
           },{
             name: this.dataName[1],
@@ -233,7 +259,14 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight'
+              position: 'insideRight',
+              formatter: function (params) {
+                if (params.value > 0) {
+                  return params.value;
+                } else {
+                  return '';
+                }
+              },
             },
           },{
             name: this.dataName[2],
@@ -242,7 +275,14 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight'
+              position: 'insideRight',
+              formatter: function (params) {
+                if (params.value > 0) {
+                  return params.value;
+                } else {
+                  return '';
+                }
+              },
             },
           },{
             name: this.dataName[3],
@@ -251,7 +291,14 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight'
+              position: 'insideRight',
+                formatter: function (params) {
+                if (params.value > 0) {
+                  return params.value;
+                } else {
+                  return '';
+                }
+              },
             },
           }],
         });
@@ -263,11 +310,24 @@
        * @date 2020/4/14
       */
       getData(){
+        if(this.ChannelNameLst.length < 1){
+          return this.$message.warning('请选择查询渠道')
+        }
+        if(!this.QueryType){
+          return this.$message.warning('请选择查询类型')
+        }
+        console.log(this.orderTime);
+        if(this.ChannelNameLst.indexOf('全部渠道') > -1){
+          this.ChannelNameLst = []
+          this.orderName.map((item, index) =>{
+            this.ChannelNameLst.push(item.channel_name)
+          })
+        }
         echarts.init(document.getElementById('myChart')).dispose();
         let data ={
           ChannelNameLst: this.ChannelNameLst,
-          StartTime: new Date(this.orderTime[0]).toISOString(),
-          EndTime: new Date(this.orderTime[1]).toISOString(),
+          StartTime: this.orderTime? new Date(this.orderTime[0]).toISOString(): null,
+          EndTime:  this.orderTime?new Date(this.orderTime[1]).toISOString(): new Date().toISOString(),
           QueryType: this.QueryType,
         }
         this.$axios.post('/query/statisticsData',JSON.stringify(data))
@@ -277,6 +337,8 @@
               let dataListArr = []
               let dataList = []
               let barArr = []
+              let messageArr = []
+              let newArr = []
 
               this.dataList = []
               this.dataName = []
@@ -299,8 +361,7 @@
                   this.dataListName.push(item)
                 }
 
-
-                console.log(this.dataListName);
+                this.barSliderType = this.dataListName.length > 10? 50: 100
                 console.log(dataListArr);
 
                 if(this.QueryType === 'RefundType') {  // 退票类型数据处理
@@ -337,6 +398,27 @@
                     }
                   }
                 }else if(this.QueryType === 'RefundMsg'){  // 退票返回信息
+                  dataListArr.map(item =>{
+                    for (let val in item){
+                      if(val){
+                        messageArr.push(val)
+                      }
+                    }
+                  })
+                  console.log([...new Set(messageArr)]);
+
+                  dataListArr.map((item, index) =>{
+                    messageArr.map((oitem, oindex) =>{
+                      barArr[oitem] = 0
+                    })
+                  })
+                  console.log(barArr);
+                  console.log(dataListArr);
+
+
+
+
+
 
                 }else if(this.QueryType === 'RefundStatus'){  // 退票状态
                   console.log(dataListArr);
