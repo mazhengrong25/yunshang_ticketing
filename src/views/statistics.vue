@@ -397,6 +397,8 @@
                       }
                     }
                   }
+                  this.drawBar()
+
                 }else if(this.QueryType === 'RefundMsg'){  // 退票返回信息
                   dataListArr.map(item =>{
                     for (let val in item){
@@ -405,11 +407,12 @@
                       }
                     }
                   })
-                  console.log([...new Set(messageArr)]);
+                  messageArr = [...new Set(messageArr)]
 
                   dataListArr.map((item, index) =>{
+                    barArr[index] = []
                     messageArr.map((oitem, oindex) =>{
-                      barArr[oitem] = 0
+                      barArr[index][oitem] = dataListArr[index][oitem]?dataListArr[index][oitem]: 0
                     })
                   })
                   console.log(barArr);
@@ -417,6 +420,83 @@
 
 
 
+
+                  // 基于准备好的dom，初始化echarts实例
+                  let myChart = echarts.init(document.getElementById('myChart'))
+                  let series = []
+                  messageArr.map((item,index) =>{
+                    let newArr = []
+                    barArr.map((oitem, oindex) =>{
+                      newArr.push(oitem[item])
+                      console.log(newArr);
+                    },
+                    series.push({
+                      name: item,
+                      type: this.chartsType,
+                      data: newArr,
+                      stack: "总量",
+                      label: {
+                        show: true,
+                        position: 'insideRight',
+                        formatter: function (params) {
+                          if (params.value > 0) {
+                            return params.value;
+                          } else {
+                            return '';
+                          }
+                        },
+                      },
+                    })
+                  )})
+                  myChart.setOption({
+                    tooltip: {
+                      trigger: 'axis',
+                      axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                      },
+                    },
+                    // title: {
+                    //   text: this.chartsTitle
+                    // },
+                    legend: {
+                      data: messageArr,
+                    },
+                    grid: {  // 图表属性
+                      left: '3%',
+                      right: '4%',
+                      bottom: '3%',
+                      containLabel: true
+                    },
+
+                    dataZoom : [{
+                      type: 'slider',
+                      filterMode: 'filter',
+                      show: this.barSliderType !== 100,
+                      yAxisIndex: [0],
+                      right: '2%',
+                      top: 0,
+                      start: 0,
+                      end: this.barSliderType, //初始化滚动条
+                      startValue:10,                           //数据窗口范围的起始数值
+                      endValue:100,
+                    }],
+
+                    toolbox: {  // 控制条
+                      show: true,
+                      feature: {
+                        saveAsImage: {},
+                      }
+                    },
+                    xAxis: {
+                      // type: 'value'
+                    },
+                    yAxis: {
+                      type: 'category',
+                      // boundaryGap: false,
+                      data: this.dataListName
+                    },
+                    series: series
+                  })
 
 
 
@@ -451,6 +531,8 @@
                       }
                     }
                   }
+                  this.drawBar()
+
                 }
 
 
@@ -460,7 +542,6 @@
                 console.log(this.dataListNot);
                 console.log(this.dataListError);
                 console.log(this.dataListVol);
-                this.drawBar()
               }else {
                 /**
                  * @Description: 单条数据图表
