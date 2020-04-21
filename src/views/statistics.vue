@@ -401,7 +401,7 @@
 
                 }else if(this.QueryType === 'RefundMsg'){  // 退票返回信息
                   dataListArr.map(item =>{
-                    for (let val in item){
+                    for (const val in item){
                       if(val){
                         messageArr.push(val)
                       }
@@ -418,9 +418,6 @@
                   console.log(barArr);
                   console.log(dataListArr);
 
-
-
-
                   // 基于准备好的dom，初始化echarts实例
                   let myChart = echarts.init(document.getElementById('myChart'))
                   let series = []
@@ -428,7 +425,7 @@
                     let newArr = []
                     barArr.map((oitem, oindex) =>{
                       newArr.push(oitem[item])
-                      console.log(newArr);
+                      // console.log(newArr);
                     },
                     series.push({
                       name: item,
@@ -454,6 +451,9 @@
                       axisPointer: {            // 坐标轴指示器，坐标轴触发有效
                         type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
                       },
+                      // formatter: function(data) {
+                      //   console.log(data);
+                      // }
                     },
                     // title: {
                     //   text: this.chartsTitle
@@ -476,8 +476,8 @@
                       right: '2%',
                       top: 0,
                       start: 0,
-                      end: this.barSliderType, //初始化滚动条
-                      startValue:10,                           //数据窗口范围的起始数值
+                      end: this.barSliderType,  //初始化滚动条
+                      startValue:10,  //数据窗口范围的起始数值
                       endValue:100,
                     }],
 

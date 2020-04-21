@@ -11,9 +11,11 @@
 
       <div class="setting_table">
         <el-table
+          v-el-table-infinite-scroll="load"
           :data="dataList"
           stripe
           border
+          height="calc(100vh - 170px)"
           highlight-current-row
           style="width: 100%">
           <el-table-column
@@ -102,8 +104,12 @@
 </template>
 
 <script>
+  import elTableInfiniteScroll from 'el-table-infinite-scroll';
   export default {
     name: "setting",
+    directives: {
+      'el-table-infinite-scroll': elTableInfiniteScroll
+    },
     data(){
       return {
         dataList: [], // 配置列表
@@ -132,8 +138,10 @@
         },
 
 
-        pageNum: 1,
-        pageSize:20,
+        limit: 20,
+        offset:0,
+
+        loadStatus: false,
       }
     },
     methods:{
@@ -146,6 +154,13 @@
         this.$router.push('/')
       },
 
+      load(){
+        if(this.loadStatus){
+          this.offset = this.offset + this.limit + 1
+          this.getDataList()
+        }
+      },
+
       /**
        * @Description: 获取配置信息
        * @author Wish
@@ -153,12 +168,24 @@
       */
       getDataList(){
         let data = {
-          project: ''
+          project: '',
+          limit: this.limit,
+          offset: this.offset,
         }
         this.$axios.post('/config/get',data)
           .then(res =>{
             if(res.data.code === 0){
-              this.dataList = res.data.data
+              if(this.loadStatus){
+                if(res.data.data.length> 0){
+                  this.dataList = this.dataList.concat(res.data.data)
+                }else {
+                  this.loadStatus = false
+                  this.$message.warning('暂无更多数据')
+                }
+              }else {
+                this.dataList = res.data.data
+                this.loadStatus = true
+              }
             }else {
               this.$message.warning(res.data.message)
             }

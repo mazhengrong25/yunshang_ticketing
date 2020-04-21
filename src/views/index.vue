@@ -286,6 +286,7 @@
           <div class="drawer_btn" @click="jumpRouter('/setting')">配置</div>
           <div class="drawer_btn" @click="jumpRouter('/statistics')">退票统计</div>
           <div class="drawer_btn" @click="jumpRouter('/readme')">接口文档</div>
+          <div class="drawer_btn" @click="jumpRouter('http://192.168.0.176:8006/swagger/index.html',true)">Swagger</div>
         </div>
       </div>
     </el-drawer>
@@ -430,8 +431,12 @@ export default {
      * @author Wish
      * @date 2020/3/27
     */
-    jumpRouter(url){
-      this.$router.push(url)
+    jumpRouter(url,type){
+      if(type){
+        window.open(url)
+      }else {
+        this.$router.push(url)
+      }
     },
 
 
