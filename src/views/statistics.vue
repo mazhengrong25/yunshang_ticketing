@@ -152,6 +152,9 @@
           toolbox: {  // 控制条
             show: true,
             feature: {
+              dataZoom: {
+                yAxisIndex:"none"
+              },
               saveAsImage: {},
             }
           },
@@ -451,9 +454,13 @@
                       axisPointer: {            // 坐标轴指示器，坐标轴触发有效
                         type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
                       },
-                      // formatter: function(data) {
-                      //   console.log(data);
-                      // }
+                      formatter: function(data) {
+                        let res = data[0].data?data[0].marker+ ' '+data[0].seriesName+'：' + data[0].data + '<br />':'';
+                        for(let i=1; i< data.length; i++){
+                          res += data[i].data?data[i].marker+ ' '+ data[i].seriesName+'：'+data[i].data + '<br />': ''
+                        }
+                        return res;
+                      },
                     },
                     // title: {
                     //   text: this.chartsTitle

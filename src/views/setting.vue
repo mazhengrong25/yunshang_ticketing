@@ -11,19 +11,25 @@
 
       <div class="setting_table">
         <el-table
-          v-el-table-infinite-scroll="load"
           :data="dataList"
+          row-key="ID"
+          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
           stripe
           border
           height="calc(100vh - 170px)"
           highlight-current-row
           style="width: 100%">
           <el-table-column
-            align="center"
-            width="300"
+            width="200"
             show-overflow-tooltip
             prop="project"
-            label="项目名称">
+            label="渠道类型">
+          </el-table-column>
+          <el-table-column
+            label="渠道名称"
+            width="300"
+            show-overflow-tooltip
+            prop="channel_name">
           </el-table-column>
           <el-table-column
             align="center"
@@ -139,7 +145,7 @@
 
 
         limit: 20,
-        offset:0,
+        // offset:0,
 
         loadStatus: false,
       }
@@ -154,12 +160,12 @@
         this.$router.push('/')
       },
 
-      load(){
-        if(this.loadStatus){
-          this.offset = this.offset + this.limit + 1
-          this.getDataList()
-        }
-      },
+      // load(){
+      //   if(this.loadStatus){
+      //     this.limit = this.limit + this.limit + 1
+      //     this.getDataList()
+      //   }
+      // },
 
       /**
        * @Description: 获取配置信息
@@ -169,22 +175,45 @@
       getDataList(){
         let data = {
           project: '',
-          limit: this.limit,
-          offset: this.offset,
+          // limit: this.limit,
+          // offset: this.offset,
         }
         this.$axios.post('/config/get',data)
           .then(res =>{
             if(res.data.code === 0){
-              if(this.loadStatus){
-                if(res.data.data.length> 0){
-                  this.dataList = this.dataList.concat(res.data.data)
-                }else {
-                  this.loadStatus = false
-                  this.$message.warning('暂无更多数据')
-                }
-              }else {
-                this.dataList = res.data.data
-                this.loadStatus = true
+              // if(this.loadStatus){
+              //   if(res.data.data.length> 0){
+              //     this.dataList = this.dataList.concat(res.data.data)
+              //   }else {
+              //     this.loadStatus = false
+              //     this.$message.warning('暂无更多数据')
+              //   }
+              // }else {
+              //
+              // }
+              let settingData= res.data.data
+
+              if(settingData.length> 0){
+                const listArr = [];
+                settingData.forEach((el,index) =>{
+                  for(let i=0; i<listArr.length; i++){
+                    if(listArr[i].project === el.project){
+                      listArr[i].children.push(el);
+                      return;
+                    }
+                  }
+                  listArr.push({
+                    project: el.project,
+                    ID: el.project + index,
+                    type: 'menu',
+                    children: [el]
+                  });
+                });
+                listArr.map(res =>{
+                  res.project = res.project + ' ('+res.children.length + ')'
+                })
+                console.log(listArr);
+                this.dataList = listArr
               }
             }else {
               this.$message.warning(res.data.message)

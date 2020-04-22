@@ -5,13 +5,13 @@
 
     <div class="search_header">
       <div class="search_box">
-        <span>渠道名称：</span>
+        <span>退票渠道：</span>
 <!--        <div class="channel_input" @click="openChannelDialog">{{channelName}}</div>-->
         <el-select
           @input="onChang($event)"
           v-model="searchData.refund_channel"
           clearable
-          size="small"
+          size="mini"
           placeholder="请选择">
           <el-option
             v-for="item in orderName"
@@ -23,18 +23,13 @@
       </div>
 
       <div class="search_box">
-        <span>平台订单号：</span>
-        <el-input size="small" clearable v-model="searchData.platform_order_no"></el-input>
-      </div>
-
-      <div class="search_box">
         <span>YATP订单号：</span>
-        <el-input size="small" clearable v-model="searchData.yatp_order_no"></el-input>
+        <el-input size="mini" clearable v-model="searchData.yatp_order_no"></el-input>
       </div>
 
       <div class="search_box">
-        <span>票号：</span>
-        <el-input size="small" clearable v-model="searchData.refund_account"></el-input>
+        <span>退票订单号：</span>
+        <el-input size="mini" clearable v-model="searchData.platform_order_no"></el-input>
       </div>
 
       <div class="search_box">
@@ -42,7 +37,7 @@
         <el-select
           v-model="searchData.refund_type"
           clearable
-          size="small"
+          size="mini"
           placeholder="请选择">
           <el-option
             v-for="item in orderType"
@@ -52,12 +47,19 @@
           </el-option>
         </el-select>
       </div>
+
+      <div class="search_box">
+        <span>票号：</span>
+        <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>
+      </div>
+
+
     </div>
     <div class="search_header">
 
       <div class="search_box">
         <span>乘车人姓名：</span>
-        <el-input size="small" clearable v-model="searchData.passenger_name"></el-input>
+        <el-input size="mini" clearable v-model="searchData.passenger_name"></el-input>
       </div>
 
       <div class="search_box">
@@ -65,7 +67,7 @@
         <el-select
           v-model="searchData.refund_status"
           clearable
-          size="small"
+          size="mini"
           placeholder="请选择">
           <el-option
             v-for="item in orderStatus"
@@ -78,13 +80,13 @@
 
 <!--      <div class="search_box">-->
 <!--        <span>退票信息：</span>-->
-<!--        <el-input size="small" clearable v-model="searchData.channel_type"></el-input>-->
+<!--        <el-input size="mini" clearable v-model="searchData.channel_type"></el-input>-->
 <!--      </div>-->
 
       <div class="search_box">
         <span>退票申请时间：</span>
         <el-date-picker
-          size="small"
+          size="mini"
           clearable
           @input="onChang($event)"
           v-model="orderTime"
@@ -99,11 +101,11 @@
 
       <div class="search_box">
         <span>退票账号：</span>
-        <el-input size="small" clearable v-model="searchData.refund_account"></el-input>
+        <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>
       </div>
 
       <div class="search_box">
-        <el-button size="small" @click="searchBtn()">搜索</el-button>
+        <el-button size="mini" type="primary" @click="searchBtn()">搜索</el-button>
       </div>
     </div>
 
@@ -113,8 +115,9 @@
         :data="dataList"
         highlight-current-row
         stripe
-        height="calc(100vh - 140px)"
+        height="calc(100vh - 116px)"
         border
+        size="small"
         @current-change="handleSelect"
         style="width: 100%;">
         <ex-table-column
@@ -129,6 +132,13 @@
           align="center"
           :autoFit="true"
           show-overflow-tooltip
+          prop="OperateDepartment"
+          label="运营部门">
+        </ex-table-column>
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
           prop="ChannelType"
           label="渠道类型">
         </ex-table-column>
@@ -137,13 +147,7 @@
 <!--          prop="ShopName"-->
 <!--          label="店铺名称">-->
 <!--        </ex-table-column>-->
-        <ex-table-column
-          align="center"
-          :autoFit="true"
-          show-overflow-tooltip
-          prop="OperateDepartment"
-          label="运营部门">
-        </ex-table-column>
+
         <ex-table-column
           align="center"
           :autoFit="true"
@@ -156,7 +160,7 @@
           :autoFit="true"
           show-overflow-tooltip
           prop="PlatformOrderNo"
-          label="平台退票订单号">
+          label="退票订单号">
         </ex-table-column>
 
         <ex-table-column
@@ -177,20 +181,6 @@
           align="center"
           :autoFit="true"
           show-overflow-tooltip
-          prop="RefundReason"
-          label="退票原因">
-        </ex-table-column>
-        <ex-table-column
-          align="center"
-          :autoFit="true"
-          show-overflow-tooltip
-          prop="RefundMsg"
-          label="退票返回消息">
-        </ex-table-column>
-        <ex-table-column
-          align="center"
-          :autoFit="true"
-          show-overflow-tooltip
           label="票号信息">
           <template slot-scope="scope">
             <div style="overflow: hidden;text-overflow: ellipsis;cursor: pointer" @click="openTicketMessage(scope.row.TicketNos)">{{scope.row.TicketNos}}</div>
@@ -200,16 +190,50 @@
           align="center"
           :autoFit="true"
           show-overflow-tooltip
-          prop="RefundAccout"
-          label="退票帐号">
+          prop="RefundPrice"
+          label="应退金额">
         </ex-table-column>
         <ex-table-column
           align="center"
           :autoFit="true"
           show-overflow-tooltip
-          label="退票申请时间">
+          prop="RealRefundPrice"
+          label="实退金额">
+        </ex-table-column>
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="RefundReason"
+          label="退票原因">
+        </ex-table-column>
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="RefundAccout"
+          label="帐号">
+        </ex-table-column>
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="RefundMsg"
+          label="返回消息">
+        </ex-table-column>
+        <ex-table-column
+          :autoFit="true"
+          show-overflow-tooltip
+          label="操作员"
+          prop="Operator">
+        </ex-table-column>
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          label="提交时间">
           <template slot-scope="scope">
-            {{$getTime(scope.row.RefundTime)}}
+            {{$getTime(scope.row.SubmitTime)}}
           </template>
         </ex-table-column>
         <ex-table-column
@@ -329,6 +353,9 @@ export default {
       },{
         value: '退票成功',
         label: '退票成功'
+      },{
+        value: '已拒单',
+        label: '已拒单'
       }],
 
       orderName: [], // 渠道名称
@@ -557,7 +584,7 @@ export default {
       .search_box{
         display: inline-flex;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 5px;
         .channel_input{
           border-radius: 4px;
           border: 1px solid #DCDFE6;
@@ -581,11 +608,12 @@ export default {
           font-size: 14px;
         }
         &:not(:last-child){
-          margin-right: 15px;
+          margin-right: 10px;
         }
       }
     }
     .main_table{
+      margin-top: 10px;
       /*.table_bottom{*/
       /*  display: flex;*/
       /*  align-items: flex-end;*/
