@@ -62,7 +62,7 @@
             align="center"
             label="操作"
             width="150">
-            <template slot-scope="scope">
+            <template slot-scope="scope" v-if="scope.row.type !== 'menu'">
               <el-button @click="openSettingDialog('edit',scope.row)" type="warning" size="mini">编辑</el-button>
               <el-button @click="deleteList(scope.row)" type="danger" size="mini">删除</el-button>
             </template>
@@ -83,17 +83,23 @@
       :show-close="false"
       width="500px">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="项目名称" prop="project">
+        <el-form-item label="渠道类型" prop="project">
           <el-input v-model="ruleForm.project"></el-input>
         </el-form-item>
+        <el-form-item label="渠道名称" prop="channel_name">
+          <el-input v-model="ruleForm.channel_name"></el-input>
+        </el-form-item>
         <el-form-item label="请求方式" prop="request_way">
-          <el-select style="width: 100%" v-model="ruleForm.request_way" placeholder="请选择请求方式">
+          <el-select style="width: 100%" v-model="ruleForm.request_way" placeholder="请选择请求方式" @change="editRequestType(ruleForm.request_way)">
             <el-option label="mq" value="mq"></el-option>
             <el-option label="http" value="http"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="请求路径" prop="url">
           <el-input v-model="ruleForm.url"></el-input>
+        </el-form-item>
+        <el-form-item label="交换机名" prop="exchange_name">
+          <el-input v-model="ruleForm.exchange_name"></el-input>
         </el-form-item>
         <el-form-item label="作者" prop="author">
           <el-input v-model="ruleForm.author"></el-input>
@@ -125,12 +131,17 @@
 
         ruleForm: {  // 弹窗字段
           project: '',
+          channel_name: '',
           request_way: '',
+          exchange_name: '',
           url: ''
         },
         rules: {  // 表单验证
-          project: [  // 项目名称
-            {required: true, message: '请填写项目名称', trigger: 'blur'}
+          project: [  // 渠道类型
+            {required: true, message: '请填写渠道类型', trigger: 'blur'}
+          ],
+          channel_name: [  // 渠道名称
+            {required: true, message: '请填写渠道名称', trigger: 'blur'}
           ],
           request_way: [  // 请求方式
             {required: true, message: '请选择请求方式', trigger: 'change'}
@@ -138,7 +149,10 @@
           url: [  // 请求路径
             {required: true, message: '请填写请求路径', trigger: 'blur'}
           ],
-          author: [  // 渠道名称
+          exchange_name: [  // 交换机名
+            {required: true, message: '请填写交换机名', trigger: 'blur'}
+          ],
+          author: [  // 作者名称
             {required: true, message: '请填写作者名称', trigger: 'blur'}
           ],
         },
@@ -158,6 +172,17 @@
       */
       backUrl(){
         this.$router.push('/')
+      },
+
+      /**
+       * @Description:
+       * @author Wish
+       * @date 2020/4/22
+      */
+      editRequestType(val){
+        this.rules.exchange_name.map(item =>{
+          return item.required = val === 'mq'
+        })
       },
 
       // load(){
@@ -216,6 +241,7 @@
                 this.dataList = listArr
               }
             }else {
+              console.log(res);
               this.$message.warning(res.data.message)
             }
           })
@@ -266,8 +292,11 @@
                   this.closedDialog()
                 }else {
                   this.$message.warning(res.data.message)
-
                 }
+              })
+              .catch(e =>{
+                console.log(e);
+                this.$message.error('错误')
               })
           }
         });
@@ -286,10 +315,8 @@
           type: 'error'
         }).then(() => {
           console.log(val);
-          let data = {
-            project: val.project
-          }
-          this.$axios.post('/config/del',data)
+
+          this.$axios.post('/config/del',val)
             .then(res =>{
               console.log(res);
               if(res.data.code === 0){

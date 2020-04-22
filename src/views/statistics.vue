@@ -573,20 +573,8 @@
                         this.dataListNot.push(0)
                         this.dataList.push(0)
                       }
-                    }else if(this.QueryType === 'RefundMsg'){  // 退票返回信息
-                      console.log(oitem);
-                      this.dataName = ['国际自愿退票暂不支持','退票操作成功','票号不存在']
-                      if(oitem === '国际自愿退票暂不支持'){
-                        this.dataListNot.push(dataList[item][oitem])
-                      }else if(oitem === '退票操作成功'){
-                        this.dataList.push(dataList[item][oitem])
-                      }else if(oitem === '票号不存在'){
-                        this.dataListError.push(dataList[item][oitem])
-                      }else {
-                        this.dataListNot.push(0)
-                        this.dataList.push(0)
-                        this.dataListError.push(0)
-                      }
+
+                      this.drawLine();  // 折线图
                     }else if(this.QueryType === 'RefundStatus'){  // 退票状态
                       console.log(oitem);
                       this.dataName = ['退票失败','退票成功']
@@ -598,9 +586,108 @@
                         this.dataListNot.push(0)
                         this.dataList.push(0)
                       }
+
+                      this.drawLine();  // 折线图
+
                     }
 
                   }
+                }
+
+                if(this.QueryType === 'RefundMsg'){  // 退票返回信息
+                  this.dataListName = Object.keys(dataList)  // 数值列表
+
+                  this.dataListName.map((item,index) =>{
+                    Object.keys(dataList[item]).map(oitem =>{
+                      messageArr.push(oitem)
+                    })
+                  })
+                  newArr = [...new Set(messageArr)]
+
+                  let series = []
+
+                  dataList.map((item, index) =>{
+                    series.push({
+                      name: this.dataListName[index],
+                      type: this.chartsType,
+                      data: newArr,
+                      label: {
+                        show: true,
+                        position: 'insideRight',
+                        formatter: function (params) {
+                          if (params.value > 0) {
+                            return params.value;
+                          } else {
+                            return '';
+                          }
+                        },
+                      },
+                    })
+                  })
+
+
+                  // // 基于准备好的dom，初始化echarts实例
+                  let myChart = echarts.init(document.getElementById('myChart'))
+                  // 绘制图表
+                  myChart.setOption({
+                    tooltip: {
+                      trigger: 'axis'
+                    },
+                    title: {
+                      text: this.chartsTitle
+                    },
+                    legend: {
+                      data: newArr,
+                      orient: 'horizontal',
+                      // x 设置水平安放位置，默认全图居中，可选值：'center' ¦ 'left' ¦ 'right' ¦ {number}（x坐标，单位px）
+
+                    },
+                    grid: {  // 图表属性
+                      left: '3%',
+                      right: '4%',
+                      bottom: '3%',
+                      containLabel: true
+                    },
+                    dataZoom: [{  // 缩放
+                      id: 'dataZoomX',
+                      type:"inside",
+                      xAxisIndex: [0],
+                      filterMode: 'filter'
+                    }],
+                    toolbox: {  // 控制条
+                      show: true,
+                      feature: {
+                        dataZoom: {
+                          yAxisIndex:"none"
+                        },
+                        saveAsImage: {},
+                      }
+                    },
+                    xAxis: {
+                      type: 'category',
+                      boundaryGap: false,
+                      data: this.dataListName
+                    },
+                    yAxis: {
+                      type: 'value'
+                    },
+                    series: series,
+                  });
+
+
+
+                  /***this.dataName = ['国际自愿退票暂不支持','退票操作成功','票号不存在']
+                   if(oitem === '国际自愿退票暂不支持'){
+                        this.dataListNot.push(dataList[item][oitem])
+                      }else if(oitem === '退票操作成功'){
+                        this.dataList.push(dataList[item][oitem])
+                      }else if(oitem === '票号不存在'){
+                        this.dataListError.push(dataList[item][oitem])
+                      }else {
+                        this.dataListNot.push(0)
+                        this.dataList.push(0)
+                        this.dataListError.push(0)
+                      }*/
                 }
 
                 console.log(this.dataList);
@@ -608,7 +695,6 @@
                 console.log(this.dataListError);
                 console.log(this.dataListName);
 
-                this.drawLine();  // 折线图
               }
             }else {
               this.$message.warning(res.data.msg)

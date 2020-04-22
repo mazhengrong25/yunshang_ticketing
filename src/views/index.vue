@@ -140,6 +140,7 @@
           :autoFit="true"
           show-overflow-tooltip
           prop="ChannelType"
+          width="50"
           label="渠道类型">
         </ex-table-column>
 <!--        <ex-table-column-->
@@ -151,12 +152,14 @@
         <ex-table-column
           align="center"
           :autoFit="true"
+          width="65"
           show-overflow-tooltip
           prop="YATPOrderNo"
           label="YATP订单号">
         </ex-table-column>
         <ex-table-column
           align="center"
+          width="150"
           :autoFit="true"
           show-overflow-tooltip
           prop="PlatformOrderNo"
@@ -191,11 +194,13 @@
           :autoFit="true"
           show-overflow-tooltip
           prop="RefundPrice"
+          width="70"
           label="应退金额">
         </ex-table-column>
         <ex-table-column
           align="center"
           :autoFit="true"
+          width="70"
           show-overflow-tooltip
           prop="RealRefundPrice"
           label="实退金额">
@@ -210,6 +215,7 @@
         <ex-table-column
           align="center"
           :autoFit="true"
+          width="70"
           show-overflow-tooltip
           prop="RefundAccout"
           label="帐号">
@@ -229,6 +235,7 @@
         </ex-table-column>
         <ex-table-column
           align="center"
+          width="125"
           :autoFit="true"
           show-overflow-tooltip
           label="提交时间">
@@ -241,6 +248,7 @@
           :autoFit="true"
           show-overflow-tooltip
           prop="Attachment"
+          width="65"
           label="非自愿附件">
         </ex-table-column>
       </el-table>
@@ -387,6 +395,8 @@ export default {
     },
     searchBtn(){
       this.dataList = []
+      this.searchData.offset = 0
+      this.searchData.limit = 20
       this.loadStatus = false
       this.getData()
     },
@@ -430,19 +440,16 @@ export default {
       }
       this.$axios.post('/refund/query',this.searchData)
         .then(res =>{
-          console.log(res);
           if(res.data.code === 0){
-            if(this.loadStatus){
               if(res.data.data.length> 0){
+                this.loadStatus = true
                 this.dataList = this.dataList.concat(res.data.data)
               }else {
                 this.loadStatus = false
                 this.$message.warning('暂无更多数据')
               }
-            }else {
-              this.dataList = res.data.data
-              this.loadStatus = true
-            }
+
+            console.log(this.dataList);
           }else {
             this.$message.error(res.data.message)
           }
