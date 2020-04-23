@@ -1,8 +1,9 @@
 <template>
   <div class="setting">
-    <div class="header_title">
-      <div class="back_btn" @click="backUrl">< 返回上一页</div>
+    <div class="header">
+      <router-link class="back_btn" to="/"><i class="el-icon-arrow-left"></i>返回</router-link>
     </div>
+
     <div class="setting_main">
       <div class="setting_title">
         <p>配置页面</p>
@@ -16,6 +17,8 @@
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
           stripe
           border
+          @row-dblclick="dbClickOpenData"
+          ref="settingTable"
           height="calc(100vh - 170px)"
           highlight-current-row
           style="width: 100%">
@@ -63,8 +66,8 @@
             label="操作"
             width="150">
             <template slot-scope="scope" v-if="scope.row.type !== 'menu'">
-              <el-button @click="openSettingDialog('edit',scope.row)" type="warning" size="mini">编辑</el-button>
-              <el-button @click="deleteList(scope.row)" type="danger" size="mini">删除</el-button>
+              <el-button @click="openSettingDialog('edit',scope.row)" type="primary" size="mini">编辑</el-button>
+              <el-button class="delete_btn" @click="deleteList(scope.row)" type="primary" plain size="mini">删除</el-button>
             </template>
           </el-table-column>
 
@@ -162,6 +165,10 @@
         // offset:0,
 
         loadStatus: false,
+
+        tableOpenName: '',
+
+        clickTableName: [],
       }
     },
     methods:{
@@ -191,6 +198,28 @@
       //     this.getDataList()
       //   }
       // },
+
+      /**
+       * @Description: 双击table行
+       * @author Wish
+       * @date 2020/4/23
+      */
+      dbClickOpenData(row, column, event){
+        console.log(row.ID);
+        console.log(this.clickTableName);
+        // for (let i = 0; )
+        this.clickTableName.forEach(item =>{
+          console.log(item === row.ID);
+          if(item === row.ID){
+            this.$refs.settingTable.toggleRowExpansion(row, false)
+            this.clickTableName.remove(row.ID)
+          }else {
+            this.$refs.settingTable.toggleRowExpansion(row, true)
+            this.clickTableName.push(row.ID)
+          }
+        })
+        console.log(this.clickTableName);
+      },
 
       /**
        * @Description: 获取配置信息
@@ -285,7 +314,6 @@
                       this.settingType === 'edit'? '/config/update' : ''
             this.$axios.post(url,this.ruleForm)
               .then(res =>{
-                console.log(res);
                 if(res.data.code === 0){
                   this.$message.success('保存成功')
                   this.getDataList()
@@ -293,10 +321,6 @@
                 }else {
                   this.$message.warning(res.data.message)
                 }
-              })
-              .catch(e =>{
-                console.log(e);
-                this.$message.error('错误')
               })
           }
         });
@@ -362,15 +386,25 @@
   .setting{
     height: 100vh;
     background: #f2f2f2;
-    padding: 20px;
+    /*padding: 20px;*/
     overflow-y: auto;
-    .header_title{
-      margin-bottom: 20px;
+    .header{
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 16px;
+      background: #0070E2;
       .back_btn{
-        font-size: 14px;
-        color: gray;
-        cursor: pointer;
+        color: #fff;
+        height: 100%;
         display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+        i{
+          margin-right: 10px;
+        }
       }
     }
     .setting_main{
@@ -383,6 +417,17 @@
         justify-content: space-between;
         >p{
           font-size: 24px;
+        }
+      }
+      .setting_table{
+        .delete_btn{
+          background: #fff;
+          border: 2px solid #409EFF;
+          transition: all .3s;
+          &:hover{
+            color: #fff;
+            background: #409EFF;
+          }
         }
       }
 

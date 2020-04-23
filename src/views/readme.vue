@@ -21,7 +21,7 @@
     },
     methods:{
       getMdData(){
-        this.$axios.get('/README.md')
+        this.$axios.get('http://192.168.0.176:8006/README.md')
           .then(res =>{
             this.markDown = res.data
           })
@@ -40,7 +40,7 @@
     align-items: center;
     padding: 0 20px;
     font-size: 16px;
-    background: rgba(0, 123, 255, 0.8);
+    background: #0070E2;
     .back_btn{
       color: #fff;
       height: 100%;

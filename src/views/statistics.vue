@@ -5,13 +5,17 @@
     </div>
 
     <div class="statistics_main">
+      <div class="statistics_title">
+        <p>退票统计</p>
+      </div>
       <div class="search_header">
-        <div class="search_box" style="flex: 1;max-width: 500px">
+        <div class="search_box search_name" style="flex: 1;max-width: 500px">
           <span class="search_title">渠道查询</span>
           <el-select
             style="flex: 1"
             @input="onChang($event)"
             v-model="ChannelNameLst"
+            :popper-append-to-body="false"
             clearable
             multiple
             size="small"
@@ -63,10 +67,23 @@
           </el-date-picker>
         </div>
 
-        <el-button size="small" @click="getData">搜索</el-button>
+        <el-button size="small" type="primary" @click="getData">搜索</el-button>
       </div>
       <div class="ticketing_charts">
         <div style="height: 100%;width: 100%" id="myChart"></div>
+        <div class="line_table" v-show="chartsType === 'line'">
+          <div class="line_table_title">
+            <p>名称</p>
+            <p>数值</p>
+          </div>
+          <div class="line_table_data">
+            <p v-for="(value, key) in lineTableNumber" v-if="key !== 'lineTotal' && key !== 'null'">
+              <span>{{key}}</span>
+              <span>{{(Math.round(value / lineTableNumber.lineTotal * 10000) / 100.00).toFixed(1)}}%</span>
+            </p>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
@@ -108,6 +125,8 @@
         barSliderType: 100, // 柱状图滚动条
 
         chartsType: 'line', // 图表类型
+        showLineTable: false,  // 折线图表格
+        lineTableNumber: {}
       }
     },
     methods:{
@@ -125,6 +144,7 @@
         let myChart = echarts.init(document.getElementById('myChart'))
         // 绘制图表
         myChart.setOption({
+          color: ['#F25645','#72C272','#F2AB45'],
           tooltip: {
             trigger: 'axis'
           },
@@ -193,11 +213,23 @@
         let myChart = echarts.init(document.getElementById('myChart'))
         // 绘制图表
         myChart.setOption({
+          color: ['#F2AB45','#F25645','#72C272','#2082E5','#F182B9','#ffaaa5'],
           tooltip: {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效
               type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-            }
+            },
+            formatter: function(data) {
+              let number = 0
+              data.map(item =>{
+                number += item.data
+              })
+              let res = data[0].data?data[0].marker+ ' '+data[0].seriesName+'：' + data[0].data +' <span style="font-size: 12px;margin-left: 10px">(占比：'+ (Math.round(data[0].data / number * 10000) / 100.00).toFixed(1)+ '%)</span>' + '<br />':'';
+              for(let i=1; i< data.length; i++){
+                res += data[i].data?data[i].marker+ ' '+ data[i].seriesName+'：'+data[i].data +' <span style="font-size: 12px;margin-left: 10px">(占比：'+ (Math.round(data[i].data / number * 10000) / 100.00).toFixed(1)+ '%)</span>' +'<br />': ''
+              }
+              return res;
+            },
           },
           // title: {
           //   text: this.chartsTitle
@@ -246,7 +278,7 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight',
+              position: 'inside',
               formatter: function (params) {
                 if (params.value > 0) {
                   return params.value;
@@ -262,7 +294,7 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight',
+              position: 'inside',
               formatter: function (params) {
                 if (params.value > 0) {
                   return params.value;
@@ -278,7 +310,7 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight',
+              position: 'inside',
               formatter: function (params) {
                 if (params.value > 0) {
                   return params.value;
@@ -294,7 +326,7 @@
             stack: "总量",
             label: {
               show: true,
-              position: 'insideRight',
+              position: 'inside',
                 formatter: function (params) {
                 if (params.value > 0) {
                   return params.value;
@@ -378,12 +410,14 @@
 
                   this.dataName = ['非自愿','自愿','非自愿退票','自愿退票']
 
+
                   for (let index in this.dataListName){
-                    console.log(JSON.stringify(dataListArr[index]));
                     // if(dataListArr[index]){}
+                    let numData = 0
+
                     for(let val in dataListArr[index]) {
-                      console.log(val);
-                      console.log(dataListArr[index][val]);
+                      numData += dataListArr[index][val]
+                      console.log(numData);
                       if(val === '非自愿'){
                         this.dataListNot.push(dataListArr[index][val])
                       }else if(val === '自愿'){
@@ -437,7 +471,12 @@
                       stack: "总量",
                       label: {
                         show: true,
-                        position: 'insideRight',
+                        position: 'inside',
+                        // itemStyle:{
+                        //   normal:{
+                        //     color: colorStyle[index],
+                        //   }
+                        // },
                         formatter: function (params) {
                           if (params.value > 0) {
                             return params.value;
@@ -449,15 +488,21 @@
                     })
                   )})
                   myChart.setOption({
+                    color: ['#F25645','#2082E5','#F2AB45','#F182B9','#72C272','#ffaaa5','#481380','#75daad'],
                     tooltip: {
                       trigger: 'axis',
                       axisPointer: {            // 坐标轴指示器，坐标轴触发有效
                         type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
                       },
                       formatter: function(data) {
-                        let res = data[0].data?data[0].marker+ ' '+data[0].seriesName+'：' + data[0].data + '<br />':'';
+                        let number = 0
+                        data.map(item =>{
+                          number += item.data
+                        })
+                        // console.log(number);
+                        let res = data[0].data?data[0].marker+ ' '+data[0].seriesName+'：' + data[0].data + ' <span style="font-size: 12px;margin-left: 10px">(占比：'+ (Math.round(data[0].data / number * 10000) / 100.00).toFixed(1)+ '%)</span>' + '<br />':'';
                         for(let i=1; i< data.length; i++){
-                          res += data[i].data?data[i].marker+ ' '+ data[i].seriesName+'：'+data[i].data + '<br />': ''
+                          res += data[i].data?data[i].marker+ ' '+ data[i].seriesName+'：'+data[i].data + ' <span style="font-size: 12px;margin-left: 10px">(占比：'+ (Math.round(data[i].data / number * 10000) / 100.00).toFixed(1)+ '%)</span>' + '<br />': ''
                         }
                         return res;
                       },
@@ -495,17 +540,15 @@
                       }
                     },
                     xAxis: {
-                      // type: 'value'
+                      // type: 'value',
                     },
                     yAxis: {
                       type: 'category',
                       // boundaryGap: false,
-                      data: this.dataListName
+                      data: this.dataListName,
                     },
                     series: series
                   })
-
-
 
                 }else if(this.QueryType === 'RefundStatus'){  // 退票状态
                   console.log(dataListArr);
@@ -556,71 +599,66 @@
                  * @date 2020/4/16
                  */
                 dataList = res.data.Data[this.ChannelNameLst.toString()][this.QueryType]
-
+                this.lineTableNumber = {}
                 this.chartsType = 'line'
                 console.log(dataList);
                 for(let item in dataList) {
                   this.dataListName.push(item)
 
                   for(let oitem in dataList[item]){
+                    this.lineTableNumber['lineTotal'] = (this.lineTableNumber['lineTotal']?this.lineTableNumber['lineTotal']: 0) + Number(dataList[item][oitem])
+                    this.lineTableNumber[oitem] = (this.lineTableNumber[oitem]?this.lineTableNumber[oitem]: 0) + Number(dataList[item][oitem])
+
                     if(this.QueryType === 'RefundType'){  // 退票类型数据处理
                       this.dataName = ['非自愿','自愿']
                       if(oitem === '非自愿'){
-                        this.dataListNot.push(dataList[item][oitem])
+                        this.dataListNot.push(dataList[item][oitem] || 0)
                       }else if(oitem === '自愿'){
-                        this.dataList.push(dataList[item][oitem])
+                        this.dataList.push(dataList[item][oitem] || 0)
                       }else {
                         this.dataListNot.push(0)
                         this.dataList.push(0)
                       }
-
                       this.drawLine();  // 折线图
                     }else if(this.QueryType === 'RefundStatus'){  // 退票状态
-                      console.log(oitem);
                       this.dataName = ['退票失败','退票成功']
                       if(oitem === '退票失败'){
-                        this.dataListNot.push(dataList[item][oitem])
+                        this.dataListNot.push(dataList[item][oitem] || 0)
                       }else if(oitem === '退票成功'){
-                        this.dataList.push(dataList[item][oitem])
+                        this.dataList.push(dataList[item][oitem] || 0)
                       }else {
                         this.dataListNot.push(0)
                         this.dataList.push(0)
                       }
-
                       this.drawLine();  // 折线图
-
                     }
 
                   }
                 }
-
                 if(this.QueryType === 'RefundMsg'){  // 退票返回信息
                   let newMsgData= []
 
                   this.dataListName = Object.keys(dataList)  // 数值列表
-
                   this.dataListName.map((item,index) =>{
                     Object.keys(dataList[item]).map(oitem =>{
-                      messageArr.push(oitem)
+                      if(oitem !== 'null'){
+                        messageArr.push(oitem)
+                      }
+                      // messageArr.push(oitem)
                     })
                   })
-                  newArr = [...new Set(messageArr)]
+                  this.dataName = [...new Set(messageArr)]
 
-                  console.log(newArr);
-
-
-                  newArr.map((item, index) =>{
+                  this.dataName.map((item, index) =>{
                     newMsgData[index] = []
                     this.dataListName.map(oitem => {
                       newMsgData[index].push(dataList[oitem][item] || 0)
-
                     })
                   })
-
                   let series = []
                   this.dataListName.map((item, index) =>{
                     series.push({
-                      name: newArr[index],
+                      name: this.dataName[index],
                       type: this.chartsType,
                       data: newMsgData[index],
                     })
@@ -631,6 +669,7 @@
                   let myChart = echarts.init(document.getElementById('myChart'))
                   // 绘制图表
                   myChart.setOption({
+                    color: ['#F25645','#2082E5','#F2AB45','#F182B9','#72C272','#ffaaa5','#481380','#75daad'],
                     tooltip: {
                       trigger: 'axis'
                     },
@@ -638,7 +677,7 @@
                       text: this.chartsTitle
                     },
                     legend: {
-                      data: newArr,
+                      data: this.dataName,
                       orient: 'horizontal',
                       // x 设置水平安放位置，默认全图居中，可选值：'center' ¦ 'left' ¦ 'right' ¦ {number}（x坐标，单位px）
 
@@ -701,6 +740,7 @@
               this.$message.warning(res.data.msg)
             }
           })
+        console.log(this.lineTableNumber);
       },
 
       /**
@@ -736,7 +776,7 @@
       align-items: center;
       padding: 0 20px;
       font-size: 16px;
-      background: rgba(0, 123, 255, 0.8);
+      background: #0070E2;
       .back_btn{
         color: #fff;
         height: 100%;
@@ -751,6 +791,15 @@
     }
     .statistics_main{
       padding: 20px;
+      .statistics_title{
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        >p{
+          font-size: 24px;
+        }
+      }
       .search_header{
         display: flex;
         align-items: flex-start;
@@ -759,6 +808,13 @@
           display: inline-flex;
           align-items: center;
           margin-right: 15px;
+          &.search_name{
+            /deep/.el-select-dropdown{
+              .el-select-dropdown__wrap{
+                min-height: 80vh;
+              }
+            }
+          }
           .search_title{
             flex-shrink: 0;
             margin-right: 10px;
@@ -767,8 +823,69 @@
       }
       .ticketing_charts{
         width: 100%;
-        height: calc(100vh - 155px);
+        height: calc(100vh - 200px);
         min-height: 500px;
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+        .line_table{
+          border: 1px solid #f2f2f2;
+          max-width: 40%;
+          /*width: 100%;*/
+          flex-shrink: 0;
+          position: absolute;
+          right: 58px;
+          top: 60px;
+          pointer-events: none;
+          background: rgba(255,255,255,.8);
+          .line_table_title{
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            p{
+              width: 100%;
+              text-align: center;
+              height: 40px;
+              line-height: 40px;
+              padding: 0 10px;
+              box-sizing: border-box;
+              &:nth-child(2){
+                width: 120px;
+              }
+              &:not(:last-child){
+                border-right: 1px solid #f2f2f2;
+              }
+            }
+          }
+          .line_table_data{
+            display: flex;
+            flex-direction: column;
+            p{
+              width: 100%;
+              display: flex;
+              align-items: center;
+              >span{
+                width: 100%;
+                text-align: center;
+                border-top: 1px solid #f2f2f2;
+                height: 30px;
+                line-height: 30px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                padding: 0 10px;
+                box-sizing: border-box;
+                &:nth-child(2){
+                  width: 120px;
+                }
+                &:not(:last-child){
+                  border-right: 1px solid #f2f2f2;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

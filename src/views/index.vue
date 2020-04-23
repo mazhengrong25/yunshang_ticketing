@@ -2,12 +2,12 @@
   <div class="index">
 
     <div class="drawer_btn" @mouseenter="openDrawer"></div>
-
     <div class="search_header">
-      <div class="search_box">
+      <div class="search_box search_name">
         <span>退票渠道：</span>
 <!--        <div class="channel_input" @click="openChannelDialog">{{channelName}}</div>-->
         <el-select
+          :popper-append-to-body="false"
           @input="onChang($event)"
           v-model="searchData.refund_channel"
           clearable
@@ -49,7 +49,7 @@
       </div>
 
       <div class="search_box">
-        <span>票号：</span>
+        <span style="min-width: unset">票号：</span>
         <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>
       </div>
 
@@ -84,6 +84,11 @@
 <!--      </div>-->
 
       <div class="search_box">
+        <span>退票账号：</span>
+        <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>
+      </div>
+
+      <div class="search_box">
         <span>退票申请时间：</span>
         <el-date-picker
           size="mini"
@@ -97,11 +102,6 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期">
         </el-date-picker>
-      </div>
-
-      <div class="search_box">
-        <span>退票账号：</span>
-        <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>
       </div>
 
       <div class="search_box">
@@ -295,10 +295,10 @@
       width="400px">
       <div>
         <div v-for="(item,index) in ticketMessageList" :key="index">
-          票号：{{item.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{item.split(',')[1] === '0'? '退款成功': '信息未收录'}}
+          票号：{{item.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{item.split(',')[1] === '0'? '已提交': '未提交'}}
         </div>
         <div v-if="ticketMessage">
-          票号：{{ticketMessage.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{ticketMessage.split(',')[1] === '0'? '退款成功': '信息未收录'}}
+          票号：{{ticketMessage.split(',')[0]}}&nbsp;&nbsp;&nbsp;状态：{{ticketMessage.split(',')[1] === '0'? '已提交': '未提交'}}
         </div>
       </div>
 
@@ -308,17 +308,17 @@
     <el-drawer
       title="我是标题"
       append-to-body
-      size="300px"
+      size="170px"
       :visible.sync="drawer"
       direction="ltr"
       :with-header="false">
       <div class="drawer_main">
         <div class="logo"><img src="../assets/logo.png" alt=""></div>
         <div class="drawer_box">
-          <div class="drawer_btn" @click="jumpRouter('/setting')">配置</div>
+          <div class="drawer_btn" @click="jumpRouter('/setting')">配置页面</div>
           <div class="drawer_btn" @click="jumpRouter('/statistics')">退票统计</div>
           <div class="drawer_btn" @click="jumpRouter('/readme')">接口文档</div>
-          <div class="drawer_btn" @click="jumpRouter('http://192.168.0.176:8006/swagger/index.html',true)">Swagger</div>
+          <div class="drawer_btn" @click="jumpRouter('/swagger/index.html',true)">Swagger</div>
         </div>
       </div>
     </el-drawer>
@@ -592,6 +592,18 @@ export default {
         display: inline-flex;
         align-items: center;
         margin-bottom: 5px;
+
+        &.search_name{
+          /deep/.el-select-dropdown{
+            /*max-height: 80vh;*/
+            .el-scrollbar{
+              .el-select-dropdown__wrap{
+                max-height: 80vh;
+                /*height: 80vh;*/
+              }
+            }
+          }
+        }
         .channel_input{
           border-radius: 4px;
           border: 1px solid #DCDFE6;
@@ -612,7 +624,10 @@ export default {
         }
         >span{
           flex-shrink: 0;
+          display: block;
           font-size: 14px;
+          min-width: 90px;
+          text-align: right;
         }
         &:not(:last-child){
           margin-right: 10px;
@@ -621,17 +636,6 @@ export default {
     }
     .main_table{
       margin-top: 10px;
-      /*.table_bottom{*/
-      /*  display: flex;*/
-      /*  align-items: flex-end;*/
-      /*  justify-content: flex-end;*/
-      /*  margin-top: 25px;*/
-      /*}*/
-      /*.table_setting{*/
-      /*  .el-button{*/
-      /*    padding: 9px 30px;*/
-      /*  }*/
-      /*}*/
     }
     .main_pagination{
     }
@@ -660,19 +664,23 @@ export default {
         .drawer_btn:not(:hover){
           color: rgba(0,0,0,.4);
         }
+        .drawer_btn:hover{
+          color: rgba(0, 123, 255, 1);
+        }
       }
       .drawer_btn{
         width: 100%;
         height: 50px;
         display: flex;
         align-items: center;
+        justify-content: center;
         cursor: pointer;
         transition: all 0.2s;
         color: rgba(0,0,0,1);
 
         &:not(:last-child){
           margin-bottom: 5px;
-          border-bottom: 1px solid #c1c1c1;
+          /*border-bottom: 1px solid #c1c1c1;*/
         }
       }
     }
