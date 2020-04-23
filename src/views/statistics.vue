@@ -595,6 +595,8 @@
                 }
 
                 if(this.QueryType === 'RefundMsg'){  // 退票返回信息
+                  let newMsgData= []
+
                   this.dataListName = Object.keys(dataList)  // 数值列表
 
                   this.dataListName.map((item,index) =>{
@@ -604,28 +606,27 @@
                   })
                   newArr = [...new Set(messageArr)]
 
-                  let series = []
+                  console.log(newArr);
 
-                  dataList.map((item, index) =>{
-                    series.push({
-                      name: this.dataListName[index],
-                      type: this.chartsType,
-                      data: newArr,
-                      label: {
-                        show: true,
-                        position: 'insideRight',
-                        formatter: function (params) {
-                          if (params.value > 0) {
-                            return params.value;
-                          } else {
-                            return '';
-                          }
-                        },
-                      },
+
+                  newArr.map((item, index) =>{
+                    newMsgData[index] = []
+                    this.dataListName.map(oitem => {
+                      newMsgData[index].push(dataList[oitem][item] || 0)
+
                     })
                   })
 
+                  let series = []
+                  this.dataListName.map((item, index) =>{
+                    series.push({
+                      name: newArr[index],
+                      type: this.chartsType,
+                      data: newMsgData[index],
+                    })
+                  })
 
+                  console.log(series);
                   // // 基于准备好的dom，初始化echarts实例
                   let myChart = echarts.init(document.getElementById('myChart'))
                   // 绘制图表
