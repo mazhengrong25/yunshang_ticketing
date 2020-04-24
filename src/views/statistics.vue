@@ -71,7 +71,7 @@
       </div>
       <div class="ticketing_charts">
         <div style="height: 100%;width: 100%" id="myChart"></div>
-        <div class="line_table" v-show="chartsType === 'line'">
+        <div class="line_table" v-show="chartsType === 'line' && dataName.length > 0">
           <div class="line_table_title">
             <p>名称</p>
             <p>数值</p>
@@ -598,43 +598,68 @@
                  * @author Wish
                  * @date 2020/4/16
                  */
+
                 dataList = res.data.Data[this.ChannelNameLst.toString()][this.QueryType]
                 this.lineTableNumber = {}
                 this.chartsType = 'line'
-                console.log(dataList);
+
                 for(let item in dataList) {
-                  this.dataListName.push(item)
-
-                  for(let oitem in dataList[item]){
-                    this.lineTableNumber['lineTotal'] = (this.lineTableNumber['lineTotal']?this.lineTableNumber['lineTotal']: 0) + Number(dataList[item][oitem])
-                    this.lineTableNumber[oitem] = (this.lineTableNumber[oitem]?this.lineTableNumber[oitem]: 0) + Number(dataList[item][oitem])
-
-                    if(this.QueryType === 'RefundType'){  // 退票类型数据处理
-                      this.dataName = ['非自愿','自愿']
-                      if(oitem === '非自愿'){
-                        this.dataListNot.push(dataList[item][oitem] || 0)
-                      }else if(oitem === '自愿'){
-                        this.dataList.push(dataList[item][oitem] || 0)
-                      }else {
-                        this.dataListNot.push(0)
-                        this.dataList.push(0)
-                      }
-                      this.drawLine();  // 折线图
-                    }else if(this.QueryType === 'RefundStatus'){  // 退票状态
-                      this.dataName = ['退票失败','退票成功']
-                      if(oitem === '退票失败'){
-                        this.dataListNot.push(dataList[item][oitem] || 0)
-                      }else if(oitem === '退票成功'){
-                        this.dataList.push(dataList[item][oitem] || 0)
-                      }else {
-                        this.dataListNot.push(0)
-                        this.dataList.push(0)
-                      }
-                      this.drawLine();  // 折线图
-                    }
-
+                  for (let oitem in dataList[item]) {
+                    this.lineTableNumber['lineTotal'] = (this.lineTableNumber['lineTotal'] ? this.lineTableNumber['lineTotal'] : 0) + Number(dataList[item][oitem])
+                    this.lineTableNumber[oitem] = (this.lineTableNumber[oitem] ? this.lineTableNumber[oitem] : 0) + Number(dataList[item][oitem])
                   }
                 }
+
+                for(let item in res.data.Data[this.ChannelNameLst.toString()][this.QueryType]) {
+                  dataListArr.push(res.data.Data[this.ChannelNameLst.toString()][this.QueryType][item])
+                  this.dataListName.push(item)
+                }
+                console.log(this.dataListName);
+
+                function sum(arr) {
+                  return eval(arr.join("+"));
+                }
+
+                if(this.QueryType === 'RefundType'){  // 退票类型数据处理
+                  this.dataName = ['非自愿','自愿']
+                  dataListArr.map((item ,index) =>{
+                    console.log(item);
+                    item['自愿'] = item['自愿']? item['自愿']: 0
+                    item['非自愿'] = item['非自愿']? item['非自愿']: 0
+                  })
+
+                  dataListArr.map(item =>{
+                    console.log(item);
+                    this.dataListNot.push(item['非自愿']?item['非自愿']:0)
+                    this.dataList.push(item['自愿']?item['自愿']:0)
+                  })
+
+                  // this.lineTableNumber['lineTotal'] = sum(this.dataListNot) + sum(this.dataList)
+                  // this.lineTableNumber['非自愿'] = sum(this.dataListNot)
+                  // this.lineTableNumber['自愿'] = sum(this.dataList)
+
+
+                  this.drawLine();  // 折线图
+                }if(this.QueryType === 'RefundStatus'){  // 退票状态
+                  this.dataName = ['退票失败','退票成功']
+                  dataListArr.map((item ,index) =>{
+                    console.log(item);
+                    item['退票失败'] = item['退票失败']? item['退票失败']: 0
+                    item['退票成功'] = item['退票成功']? item['退票成功']: 0
+                  })
+
+                  dataListArr.map(item =>{
+                    console.log(item);
+                    this.dataListNot.push(item['退票失败']?item['退票失败']:0)
+                    this.dataList.push(item['退票成功']?item['退票成功']:0)
+                  })
+                  // this.lineTableNumber['lineTotal'] = sum(this.dataListNot) + sum(this.dataList)
+                  // this.lineTableNumber['退票失败'] = sum(this.dataListNot)
+                  // this.lineTableNumber['退票成功'] = sum(this.dataList)
+                  this.drawLine();  // 折线图
+                }
+
+
                 if(this.QueryType === 'RefundMsg'){  // 退票返回信息
                   let newMsgData= []
 
