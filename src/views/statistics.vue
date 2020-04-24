@@ -835,8 +835,12 @@
           margin-right: 15px;
           &.search_name{
             /deep/.el-select-dropdown{
-              .el-select-dropdown__wrap{
-                min-height: 80vh;
+              /*max-height: 80vh;*/
+              .el-scrollbar{
+                .el-select-dropdown__wrap{
+                  max-height: 80vh;
+                  /*height: 80vh;*/
+                }
               }
             }
           }

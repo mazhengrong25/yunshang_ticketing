@@ -64,7 +64,7 @@
             fixed="right"
             align="center"
             label="操作"
-            width="150">
+            width="160">
             <template slot-scope="scope" v-if="scope.row.type !== 'menu'">
               <el-button @click="openSettingDialog('edit',scope.row)" type="primary" size="mini">编辑</el-button>
               <el-button class="delete_btn" @click="deleteList(scope.row)" type="primary" plain size="mini">删除</el-button>
@@ -168,7 +168,7 @@
 
         tableOpenName: '',
 
-        clickTableName: [],
+        clickTableName: ['占位符'],
       }
     },
     methods:{
@@ -205,20 +205,16 @@
        * @date 2020/4/23
       */
       dbClickOpenData(row, column, event){
-        console.log(row.ID);
-        console.log(this.clickTableName);
-        // for (let i = 0; )
-        this.clickTableName.forEach(item =>{
-          console.log(item === row.ID);
+        console.log('双击 '+ row.ID);
+        this.clickTableName.forEach((item,index) =>{
           if(item === row.ID){
             this.$refs.settingTable.toggleRowExpansion(row, false)
-            this.clickTableName.remove(row.ID)
+            this.clickTableName.splice(index)
           }else {
             this.$refs.settingTable.toggleRowExpansion(row, true)
             this.clickTableName.push(row.ID)
           }
         })
-        console.log(this.clickTableName);
       },
 
       /**
@@ -422,11 +418,12 @@
       .setting_table{
         .delete_btn{
           background: #fff;
-          border: 2px solid #409EFF;
+          border: 2px solid #0070E2;
           transition: all .3s;
+          color: #0070E2;
           &:hover{
             color: #fff;
-            background: #409EFF;
+            background: #0070E2;
           }
         }
       }

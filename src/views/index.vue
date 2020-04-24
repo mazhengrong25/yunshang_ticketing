@@ -134,6 +134,11 @@
           show-overflow-tooltip
           prop="OperateDepartment"
           label="运营部门">
+          <template slot-scope="scope">
+            <div class="table_hidden_txt">
+              <p>{{scope.row.OperateDepartment}}</p>
+            </div>
+          </template>
         </ex-table-column>
         <ex-table-column
           align="center"
@@ -228,19 +233,27 @@
           label="返回消息">
         </ex-table-column>
         <ex-table-column
+          align="center"
           :autoFit="true"
           show-overflow-tooltip
           label="操作员"
           prop="Operator">
+          <template slot-scope="scope">
+            <div class="table_hidden_txt">
+              <p>{{scope.row.Operator}}</p>
+            </div>
+          </template>
         </ex-table-column>
         <ex-table-column
           align="center"
-          width="125"
+          width="100"
           :autoFit="true"
           show-overflow-tooltip
           label="提交时间">
           <template slot-scope="scope">
-            {{$getTime(scope.row.SubmitTime)}}
+            <div class="table_hidden_txt">
+              <p>{{$getTime(scope.row.SubmitTime)}}</p>
+            </div>
           </template>
         </ex-table-column>
         <ex-table-column
@@ -636,6 +649,26 @@ export default {
     }
     .main_table{
       margin-top: 10px;
+      .table_hidden_txt{
+        position: relative;
+        padding-left: 10px;
+        box-sizing: content-box;
+        &:before{
+          content: '...';
+          position: absolute;
+          left: 0;
+          height: 100%;
+          /*background: #fff;*/
+        }
+        p{
+          overflow: hidden;
+          text-align: right;
+          display: flex;
+          justify-content: flex-end;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
     }
     .main_pagination{
     }

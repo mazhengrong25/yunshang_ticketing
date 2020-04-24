@@ -30,5 +30,9 @@
       }
     }
   }
+  /deep/.el-button.el-button--primary{
+    background-color: #0070E2;
+    border-color: #0070E2;
+  }
 
 </style>
