@@ -19,6 +19,8 @@ import {
   Drawer,
   OptionGroup,
   MessageBox,
+  Tabs,
+  TabPane,
   Message } from 'element-ui';
 
 Vue.use(Button)
@@ -34,6 +36,8 @@ Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Drawer)
 Vue.use(OptionGroup)
+Vue.use(Tabs)
+Vue.use(TabPane)
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;
@@ -44,6 +48,8 @@ Vue.component(ExTableColumn.name, ExTableColumn);
 
 import axios from "axios";
 Vue.prototype.$axios = axios;
+
+// axios.defaults.baseURL = 'http://192.168.0.176:8006'
 
 import('../src/utlis/tools')
 

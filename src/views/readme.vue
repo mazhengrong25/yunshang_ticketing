@@ -21,7 +21,7 @@
     },
     methods:{
       getMdData(){
-        this.$axios.get('http://192.168.0.176:8006/README.md')
+        this.$axios.get('/README.md')
           .then(res =>{
             this.markDown = res.data
           })

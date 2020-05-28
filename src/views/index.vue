@@ -29,7 +29,7 @@
 
       <div class="search_box">
         <span>退票订单号：</span>
-        <el-input size="mini" clearable v-model="searchData.platform_order_no"></el-input>
+        <el-input size="mini" clearable v-model="searchData.platform_orderNo"></el-input>
       </div>
 
       <div class="search_box">
@@ -48,19 +48,19 @@
         </el-select>
       </div>
 
-      <div class="search_box">
-        <span style="min-width: unset">票号：</span>
-        <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>
-      </div>
+<!--      <div class="search_box">-->
+<!--        <span style="min-width: unset">票号：</span>-->
+<!--        <el-input size="mini" clearable v-model="searchData.refund_account"></el-input>-->
+<!--      </div>-->
 
 
     </div>
     <div class="search_header">
 
-      <div class="search_box">
-        <span>乘车人姓名：</span>
-        <el-input size="mini" clearable v-model="searchData.passenger_name"></el-input>
-      </div>
+<!--      <div class="search_box">-->
+<!--        <span>乘车人姓名：</span>-->
+<!--        <el-input size="mini" clearable v-model="searchData.passenger_name"></el-input>-->
+<!--      </div>-->
 
       <div class="search_box">
         <span>提交状态：</span>
@@ -136,6 +136,7 @@
           label="运营部门">
           <template slot-scope="scope">
             <div class="table_hidden_txt">
+              <span></span>
               <p>{{scope.row.OperateDepartment}}</p>
             </div>
           </template>
@@ -240,6 +241,7 @@
           prop="Operator">
           <template slot-scope="scope">
             <div class="table_hidden_txt">
+              <span></span>
               <p>{{scope.row.Operator}}</p>
             </div>
           </template>
@@ -252,6 +254,7 @@
           label="提交时间">
           <template slot-scope="scope">
             <div class="table_hidden_txt">
+              <span></span>
               <p>{{$getTime(scope.row.SubmitTime)}}</p>
             </div>
           </template>
@@ -356,10 +359,10 @@ export default {
       },
       orderTime: '',  // 退票申请时间
       orderType: [{  // 退票类型
-        value: 1,
+        value: '自愿',
         label: '自愿'
       },{
-        value: 2,
+        value: '非自愿',
         label: '非自愿'
       }],
       orderStatus: [{  // 提交状态
@@ -436,14 +439,12 @@ export default {
        * @date 2020/3/13
        */
       if(this.orderTime){
-        let thisDate = new Date().getTime();  // 现在时间
-        console.log(thisDate,new Date(this.orderTime[0]).getTime());
-        if(thisDate >= new Date(this.orderTime[0]).getTime()){
-          this.$message.warning('请选择大于当前日期')
-        }else {
-          this.searchData['start_time'] = new Date(this.orderTime[0]).toISOString()
-          this.searchData['end_time'] = new Date(this.orderTime[1]).toISOString()
-        }
+        // if(thisDate >= new Date(this.orderTime[0]).getTime()){
+        //   this.$message.warning('请选择大于当前日期')
+        // }else {
+        this.searchData['start_time'] = new Date(this.orderTime[0]).toISOString()
+          this.searchData['end_time'] = this.orderTime[1] + 'T23:59:59.000Z'
+        // }
       }else {
         delete this.searchData.start_time
         delete this.searchData.end_time
@@ -651,14 +652,14 @@ export default {
       margin-top: 10px;
       .table_hidden_txt{
         position: relative;
-        padding-left: 10px;
+        /*padding-left: 10px;*/
         box-sizing: content-box;
-        &:before{
-          content: '...';
-          position: absolute;
-          left: 0;
-          height: 100%;
-          /*background: #fff;*/
+        &::before{
+          /*content: '...';*/
+          float:right;
+          position: relative;
+          right:100%;
+          transform: translate(-100%,-100%);
         }
         p{
           overflow: hidden;
@@ -667,6 +668,8 @@ export default {
           justify-content: flex-end;
           white-space: nowrap;
           text-overflow: ellipsis;
+          -webkit-line-clamp: 1;
+          word-break: break-all;
         }
       }
     }
