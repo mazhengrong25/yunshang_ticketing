@@ -28,7 +28,7 @@ export default {
   components: {
     settingTemplate: () => import("@/components/settingTemplate"),
     configFileTemplate: () => import("@/components/configFileTemplate"),
-    officeTemplate: () => import('@/components/officeTemplate')
+    officeTemplate: () => import("@/components/officeTemplate")
   },
   data() {
     return {
@@ -49,7 +49,7 @@ export default {
     handleClick(tab, event) {
       if (tab.name === "setting") {
         this.$refs.getSettingData.getDataList();
-      }else if(tab.name === 'configFile'){
+      } else if (tab.name === "configFile") {
         this.$refs.getConfigData.getDataList();
       }
     }

@@ -1,12 +1,3 @@
-<!--
- * @Author: your name
- * @Date: 2020-05-28 14:56:28
- * @LastEditTime: 2020-05-28 14:58:01
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \yunshang_ticketing\src\components\officeTemplate.vue
---> 
-
 <template>
   <div class="office_no">
 
