@@ -24,6 +24,8 @@ import {
   Switch,
   Row,
   Col,
+  Link,
+  Tooltip,
   Message } from 'element-ui';
 
 Vue.use(Button)
@@ -44,6 +46,8 @@ Vue.use(TabPane)
 Vue.use(Switch)
 Vue.use(Row)
 Vue.use(Col)
+Vue.use(Link)
+Vue.use(Tooltip)
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;

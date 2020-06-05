@@ -21,9 +21,9 @@ const routes = [
     name: 'Statistics',
     component: () => import('@/views/statistics')
   },{
-    path: '/game',
-    name: 'game',
-    component: () => import('@/views/game')
+    path: '/settingDetails',
+    name: 'SettingDetails',
+    component: () => import('@/views/settingDetails')
   }
 ]
 

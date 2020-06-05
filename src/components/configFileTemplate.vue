@@ -46,16 +46,22 @@
       class="config_dialog"
     >
       <div class="dialog_main">
-        <el-form :model="configForm" :rules="rules" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+        <el-form
+          :model="configForm"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="150px"
+          class="demo-ruleForm"
+        >
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="航司名称" prop="air_company">
-                <el-input v-model="configForm.air_company"></el-input>
+                <el-input clearable v-model="configForm.air_company"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="航司二字码">
-                <el-input v-model="configForm.air_company_code"></el-input>
+                <el-input clearable v-model="configForm.air_company_code"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -63,12 +69,12 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="航线" prop="airline">
-                <el-input v-model="configForm.airline"></el-input>
+                <el-input clearable v-model="configForm.airline"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="航线范围">
-                <el-input v-model="configForm.airline_scope"></el-input>
+                <el-input clearable v-model="configForm.airline_scope"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -76,12 +82,12 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="豁免代码">
-                <el-input v-model="configForm.code_for_free"></el-input>
+                <el-input clearable v-model="configForm.code_for_free"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="扩展参数">
-                <el-input v-model="configForm.extra"></el-input>
+                <el-input clearable v-model="configForm.extra"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -89,7 +95,7 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="非自愿退票渠道" prop="involuntary_channel">
-                <el-input v-model="configForm.involuntary_channel"></el-input>
+                <el-input clearable v-model="configForm.involuntary_channel"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -126,7 +132,12 @@
 
             <el-col :span="12">
               <el-form-item label="发布日期">
-                <el-input v-model="configForm.publish_time"></el-input>
+                <el-date-picker
+                  v-model="configForm.publish_time"
+                  type="datetime"
+                  placeholder="发布日期"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>
               </el-form-item>
             </el-col>
           </el-row>
@@ -134,12 +145,38 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="起飞时间段">
-                <el-input v-model="configForm.takeoff_time"></el-input>
+                <!-- <el-date-picker
+                  v-model="configForm.takeoff_time"
+                  type="datetimerange"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :default-time="['00:00:00']"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>-->
+                <el-date-picker
+                  v-model="configForm.takeoff_time"
+                  type="datetime"
+                  placeholder="选择起飞时间段"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="出票起始时间段">
-                <el-input v-model="configForm.ticket_time"></el-input>
+                <!-- <el-date-picker
+                  v-model="configForm.ticket_time"
+                  type="datetimerange"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :default-time="['00:00:00']"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>-->
+                <el-date-picker
+                  v-model="configForm.ticket_time"
+                  type="datetime"
+                  placeholder="选择出票起始时间段"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>
               </el-form-item>
             </el-col>
           </el-row>
@@ -147,12 +184,25 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="有效期" prop="validate_time">
-                <el-input v-model="configForm.validate_time"></el-input>
+                <!-- <el-date-picker
+                  v-model="configForm.validate_time"
+                  type="datetimerange"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :default-time="['00:00:00']"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>-->
+                <el-date-picker
+                  v-model="configForm.validate_time"
+                  type="datetime"
+                  placeholder="选择有效期"
+                  value-format="yyyy-MM-ddTHH:mm:ss+08:00"
+                ></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="自愿退票渠道" prop="voluntary_channel">
-                <el-input v-model="configForm.voluntary_channel"></el-input>
+                <el-input clearable v-model="configForm.voluntary_channel"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -214,12 +264,29 @@ export default {
      * @param {type}
      * @return:
      */
-
     openConfigDialog(type, data) {
       this.dialogTitleType = type;
-      
-      this.configForm = type === 'edit'?JSON.parse(JSON.stringify(data)):{}
-      
+
+      if (type === "edit") {
+        this.configForm = JSON.parse(JSON.stringify(data));
+        console.log(this.configForm);
+        // if (this.configForm.takeoff_time) {
+        //   this.configForm.takeoff_time = this.configForm.takeoff_time.split(
+        //     "|"
+        //   );
+        // }
+        // if (this.configForm.ticket_time) {
+        //   this.configForm.ticket_time = this.configForm.ticket_time.split("|");
+        // }
+        // if (this.configForm.validate_time) {
+        //   this.configForm.validate_time = this.configForm.validate_time.split(
+        //     "|"
+        //   );
+        // }
+      } else {
+        this.configForm = {};
+      }
+
       console.log(type, data);
       this.configDialog = true;
     },
@@ -231,17 +298,46 @@ export default {
      */
     editCinfig(val) {
       console.log(val);
+      this.$axios.delete('/config/configFile/'+val.air_company)
+        .then(res =>{
+          this.$message(res.data.message)
+        if(res.data.code === 0){
+          this.getDataList()
+        }
+        })
     },
-
 
     /**
      * @description: 表单提交按钮
-     * @param {type} 
-     * @return: 
-     */    
-    submitBtn(){
-     console.log( this.configForm);
-     
+     * @param {type}
+     * @return:
+     */
+
+    submitBtn() {
+      let formData = JSON.parse(JSON.stringify(this.configForm));
+
+      formData.takeoff_time =
+        formData.takeoff_time.length > 0
+          ? String(formData.takeoff_time).replace(",", "|")
+          : ""; // 起飞时间段
+      formData.ticket_time =
+        formData.ticket_time.length > 0
+          ? String(formData.ticket_time).replace(",", "|")
+          : ""; // 出票起始时间段
+      formData.validate_time =
+        formData.validate_time.length > 0
+          ? String(formData.validate_time).replace(",", "|")
+          : ""; // 有效期
+
+      console.log(formData);
+
+      this.$axios.post("/config/configFile", formData).then(res => {
+        this.$message(res.data.message)
+        if(res.data.code === 0){
+          this.configDialog = false;
+          this.getDataList()
+        }
+      });
     }
   }
 };
@@ -264,12 +360,14 @@ export default {
       max-width: 1200px;
       width: 100%;
       margin: 0 50px !important;
-      
 
       .el-dialog__body {
         padding-bottom: unset;
         overflow: auto;
       }
+    }
+    /deep/.el-date-editor {
+      width: 100%;
     }
   }
 }

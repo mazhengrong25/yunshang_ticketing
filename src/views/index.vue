@@ -100,29 +100,41 @@
         size="small"
         @current-change="handleSelect"
         style="width: 100%;"
+        @selection-change="handleSelectionChange"
       >
-        <ex-table-column
-          :autoFit="true"
-          align="center"
-          fixed
-          show-overflow-tooltip
-          prop="RefundChannel"
-          label="退票渠道"
-        ></ex-table-column>
-        <ex-table-column
-          align="center"
-          :autoFit="true"
-          show-overflow-tooltip
-          prop="OperateDepartment"
-          label="运营部门"
-        >
+        <ex-table-column type="selection" width="40" align="center"></ex-table-column>
+
+        <ex-table-column 
+        align="center"
+         :autoFit="true" 
+         width="130"
+         label="操作">
           <template slot-scope="scope">
-            <div class="table_hidden_txt">
-              <span></span>
-              <p>{{scope.row.OperateDepartment}}</p>
+            <div class="table_setting" style="display: flex">
+              <el-button size="mini" @click="updateBtn(scope.row)" class="table_setting_ico" type="primary">更新</el-button>
+            <el-button size="mini" @click="updateBtn(scope.row)" class="table_setting_ico" type="warning">再提</el-button>
             </div>
           </template>
         </ex-table-column>
+
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="RefundStatus"
+          label="退票状态"
+          width="100"
+        ></ex-table-column>
+
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="RefundType"
+          label="退票类型"
+          width="100"
+        ></ex-table-column>
+
         <ex-table-column
           align="center"
           :autoFit="true"
@@ -133,13 +145,26 @@
         ></ex-table-column>
 
         <ex-table-column
-          align="center"
           :autoFit="true"
-          width="65"
+          align="center"
           show-overflow-tooltip
-          prop="YATPOrderNo"
-          label="YATP订单号"
+          prop="RefundChannel"
+          label="退票渠道"
         ></ex-table-column>
+
+        <ex-table-column :autoFit="true" align="center" show-overflow-tooltip label="PNR">
+          <template slot-scope="scope">
+            <div class="jumpDetalis" @click="jumpDetails(scope.row)">
+              <el-link v-if="scope.row.PNR" class="pnrText" type="primary">{{scope.row.PNR}}</el-link>
+              <el-link
+                v-if="scope.row.PNRChanged"
+                :class="scope.row.PNR?'newPnrText':'pnrText'"
+                :type="scope.row.PNR?'danger':'primary'"
+              >{{scope.row.PNRChanged}}</el-link>
+            </div>
+          </template>
+        </ex-table-column>
+
         <ex-table-column
           align="center"
           width="150"
@@ -152,25 +177,29 @@
         <ex-table-column
           align="center"
           :autoFit="true"
+          width="65"
           show-overflow-tooltip
-          prop="RefundType"
-          label="退票类型"
+          prop="YATPOrderNo"
+          label="YATP订单号"
         ></ex-table-column>
+
+        <ex-table-column
+          align="center"
+          :autoFit="true"
+          width="65"
+          show-overflow-tooltip
+          prop="PurchaseID"
+          label="采购单号"
+        ></ex-table-column>
+
         <ex-table-column
           align="center"
           :autoFit="true"
           show-overflow-tooltip
-          prop="RefundStatus"
-          label="退票状态"
+          prop="RefundMsg"
+          label="返回消息"
         ></ex-table-column>
-        <ex-table-column align="center" :autoFit="true" show-overflow-tooltip label="票号信息">
-          <template slot-scope="scope">
-            <div
-              style="overflow: hidden;text-overflow: ellipsis;cursor: pointer"
-              @click="openTicketMessage(scope.row.TicketNos)"
-            >{{scope.row.TicketNos}}</div>
-          </template>
-        </ex-table-column>
+
         <ex-table-column
           align="center"
           :autoFit="true"
@@ -189,26 +218,59 @@
         ></ex-table-column>
         <ex-table-column
           align="center"
+          width="100"
+          :autoFit="true"
+          show-overflow-tooltip
+          label="更新时间"
+        >
+          <template slot-scope="scope">
+            <div class="table_hidden_txt">
+              <span></span>
+              <p>{{$getTime(scope.row.SubmitTime)}}</p>
+            </div>
+          </template>
+        </ex-table-column>
+
+        <!-- <ex-table-column
+          align="center"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="OperateDepartment"
+          label="运营部门"
+        >
+          <template slot-scope="scope">
+            <div class="table_hidden_txt">
+              <span></span>
+              <p>{{scope.row.OperateDepartment}}</p>
+            </div>
+          </template>
+        </ex-table-column>-->
+
+        <!-- <ex-table-column align="center" :autoFit="true" show-overflow-tooltip label="票号信息">
+          <template slot-scope="scope">
+            <div
+              style="overflow: hidden;text-overflow: ellipsis;cursor: pointer"
+              @click="openTicketMessage(scope.row.TicketNos)"
+            >{{scope.row.TicketNos}}</div>
+          </template>
+        </ex-table-column>-->
+
+        <ex-table-column
+          align="center"
           :autoFit="true"
           show-overflow-tooltip
           prop="RefundReason"
           label="退票原因"
         ></ex-table-column>
-        <ex-table-column
+        <!-- <ex-table-column
           align="center"
           :autoFit="true"
           width="70"
           show-overflow-tooltip
           prop="RefundAccout"
           label="帐号"
-        ></ex-table-column>
-        <ex-table-column
-          align="center"
-          :autoFit="true"
-          show-overflow-tooltip
-          prop="RefundMsg"
-          label="返回消息"
-        ></ex-table-column>
+        ></ex-table-column>-->
+
         <ex-table-column
           align="center"
           :autoFit="true"
@@ -223,28 +285,15 @@
             </div>
           </template>
         </ex-table-column>
-        <ex-table-column
-          align="center"
-          width="100"
-          :autoFit="true"
-          show-overflow-tooltip
-          label="提交时间"
-        >
-          <template slot-scope="scope">
-            <div class="table_hidden_txt">
-              <span></span>
-              <p>{{$getTime(scope.row.SubmitTime)}}</p>
-            </div>
-          </template>
-        </ex-table-column>
-        <ex-table-column
+
+        <!-- <ex-table-column
           align="center"
           :autoFit="true"
           show-overflow-tooltip
           prop="Attachment"
           width="65"
           label="非自愿附件"
-        ></ex-table-column>
+        ></ex-table-column>-->
       </el-table>
       <div class="table_bottom">
         <!--        <el-pagination-->
@@ -290,7 +339,7 @@
       </div>
     </el-dialog>
 
-    <el-drawer
+    <!-- <el-drawer
       title="我是标题"
       append-to-body
       size="170px"
@@ -309,7 +358,26 @@
           <div class="drawer_btn" @click="jumpRouter('/swagger/index.html',true)">Swagger</div>
         </div>
       </div>
-    </el-drawer>
+    </el-drawer>-->
+
+    <el-dialog
+      custom-class="update_setting"
+      title="更新退票状态"
+      :visible.sync="updateSettingDialog"
+      width="400px"
+    >
+      <div class="update_setting_main">
+        <el-form ref="form" label-width="80px">
+          <el-form-item label="活动名称">
+            <el-input v-model="updateSetting.buyOrders"></el-input>
+          </el-form-item>
+
+
+
+        </el-form>
+
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -375,9 +443,12 @@ export default {
 
       ticketMessageDialog: false, // 票号信息弹窗
       ticketMessageList: [], // 票号信息列表
-      ticketMessage: "" // 票号信息
+      ticketMessage: "", // 票号信息
       // pageNum: 1,
       // pageSize:10
+
+      updateSettingDialog: false, // 更新退票状态
+      updateSetting: {}, // 更新状态数据
     };
   },
   methods: {
@@ -440,7 +511,7 @@ export default {
         .post("/refund/query", this.searchData)
         .then(res => {
           if (res.data.code === 0) {
-            if (res.data.data.length > 0) {
+            if (res.data.data && res.data.data.length > 0) {
               this.loadStatus = true;
               this.dataList = this.dataList.concat(res.data.data);
             } else {
@@ -537,6 +608,38 @@ export default {
      */
     handleSelect(val) {
       this.channelName = val.RefundChannel;
+    },
+
+    /**
+     * @description: 表格勾选
+     * @param {type}
+     * @return:
+     */
+    handleSelectionChange(val) {
+      console.log(val);
+    },
+
+    /**
+     * @description: 修改按钮
+     * @param {type}
+     * @return:
+     */
+
+    updateBtn(data) {
+      console.log(data);
+    },
+
+    /**
+     * @description: 跳转详情
+     * @param {type}
+     * @return:
+     */
+    jumpDetails(val) {
+      console.log(val);
+      let routeData = this.$router.resolve({
+        path: "/settingDetails",
+      });
+      window.open(routeData.href, '_blank');
     }
   },
   filters: {
@@ -552,6 +655,36 @@ export default {
   },
   mounted() {
     this.getChannelList();
+
+    this.dataList.push({
+      Attachment: "",
+      ChannelType: "BOP",
+      Headers: "",
+      ID: 1,
+      OperateDepartment: "国际机票┝正航组┝去哪儿组",
+      Operator: "国际机票┝正航组┝综合组┝出票/退改┠张媚(9682)",
+      OriginalData:
+        '{  "ApiInfo": null,  "Attachments": [  ],  "AuditorName": "国际机票┝正航组┝综合组┝出票/退改┠张媚(9682)",  "AuditorTime": "2020-05-12T11:03:02.8407853",  "BuyAmount": -1148,  "BuyOrders": [    {      "BuyAmount": -1148,      "BuyChannel": {        "Account": "CKG177",        "AccountAbbr": "CKG177|CKG177",        "ChannelInt": null,        "ChannelType": "BOP",        "ChannelTypeName": "BOP",        "Id": 24,        "Name": "wiken_test",        "NameAbbr": "BOP_CKG177|BOP_CKG177",        "OrderCapacity": "It",        "Organization": null,        "OrganizationId": null,        "PaymentId": 166,        "PaymentName": "BOP_CKG177",        "Remark": "",        "SaleBuyCapacity": "Buy"      },      "BuyForeignAmount": -1148,      "CreationTime": "2020-05-12T10:46:13.1986257",      "Currency": "CNY",      "ExchangeRate": 1,      "ExtensionData": "{"SubmitMsg":"申请提交__2020-05-13 10:52:04┠ ()@_@提交失败__2020-05-13 10:33:53__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:33:38┠ ()@_@提交失败__2020-05-13 10:33:03__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:32:47┠ ()@_@","SubmitUser":"()","SubmitTime":"2020-05-13 10:52:04"}",      "GdsName": "TravelSky",      "Id": 68808,      "IsVoluntary": true,      "OfficeNo": "CKG177",      "OuterBuyOderId": null,      "Passengers": [        {          "AirRax": 0,          "BuyAdjustPrice": 0,          "BuyAdjustServiceFee": 0,          "BuyAgencyFee": 0,          "BuyAirRax": 0,          "BuyCashBack": 0,          "BuyChangePrice": 0,          "BuyDelayFee": 0,          "BuyInsurePrice": 0,          "BuyOtherFee": 0,          "BuyRebate": 0,          "BuyRefundFee": 0,          "BuyServiceFee": 0,          "BuySum": -1148,          "BuyTaxDetail": "",          "BuyTicketPrice": -750,          "BuyTicketTax": -398,          "CertNo": "TZ1276596",          "CertType": "Passport",          "Id": 96193,          "Name": "TAKEDA/AMIME",          "PassengerType": "Adult",          "PassengerVoyages": [            {              "Id": 1491455,              "TicketNo": "7843397179293",              "VoyageId": 2385173            }          ],          "SaleAdjustPrice": 0,          "SaleAdjustServiceFee": 0,          "SaleAgencyFee": 0,          "SaleCashBack": 0,          "SaleChangePrice": 0,          "SaleDelayFee": 0,          "SaleInsurePrice": 0,          "SaleOtherFee": 0,          "SaleRebate": 0,          "SaleRefundFee": 0,          "SaleServiceFee": 0,          "SaleSum": -1118,          "SaleTicketPrice": -720,          "SaleTicketTax": -398        }      ],      "Paylogs": null,      "Pnr": {        "BigPnrCode": "PX3H4Y",        "GdsName": "TravelSky",        "Id": "1523815",        "OfficeNo": "CKG177",        "PnrCode": "KY302Z",        "Source": "BySale",        "SourceNo": "202003131404370512"      },      "ReceivedAmount": 0,      "RefundBuyOrderNo": "202005121046130012",      "RefundStatus": "NonePay",      "RefundType": null,      "SubmitStatus": "NotSubmit"    },    {      "BuyAmount": -1148,      "BuyChannel": {        "Account": "CKG177",        "AccountAbbr": "CKG177|CKG177",        "ChannelInt": null,        "ChannelType": "BOP",        "ChannelTypeName": "BOP",        "Id": 24,        "Name": "wiken_test",        "NameAbbr": "BOP_CKG177|BOP_CKG177",        "OrderCapacity": "It",        "Organization": null,        "OrganizationId": null,        "PaymentId": 166,        "PaymentName": "BOP_CKG177",        "Remark": "",        "SaleBuyCapacity": "Buy"      },      "BuyForeignAmount": -1148,      "CreationTime": "2020-05-12T10:46:13.1986257",      "Currency": "CNY",      "ExchangeRate": 1,      "ExtensionData": "{"SubmitMsg":"申请提交__2020-05-13 10:52:04┠ ()@_@提交失败__2020-05-13 10:33:53__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:33:38┠ ()@_@提交失败__2020-05-13 10:33:03__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:32:47┠ ()@_@","SubmitUser":"()","SubmitTime":"2020-05-13 10:52:04"}",      "GdsName": "TravelSky",      "Id": 68807,      "IsVoluntary": true,      "OfficeNo": "CKG177",      "OuterBuyOderId": null,      "Passengers": [        {          "AirRax": 0,          "BuyAdjustPrice": 0,          "BuyAdjustServiceFee": 0,          "BuyAgencyFee": 0,          "BuyAirRax": 0,          "BuyCashBack": 0,          "BuyChangePrice": 0,          "BuyDelayFee": 0,          "BuyInsurePrice": 0,          "BuyOtherFee": 0,          "BuyRebate": 0,          "BuyRefundFee": 0,          "BuyServiceFee": 0,          "BuySum": -1148,          "BuyTaxDetail": "",          "BuyTicketPrice": -750,          "BuyTicketTax": -398,          "CertNo": "TZ1276596",          "CertType": "Passport",          "Id": 96193,          "Name": "TAKEDA/AMIME",          "PassengerType": "Adult",          "PassengerVoyages": [            {              "Id": 1491455,              "TicketNo": "7843397179294",              "VoyageId": 2385173            }          ],          "SaleAdjustPrice": 0,          "SaleAdjustServiceFee": 0,          "SaleAgencyFee": 0,          "SaleCashBack": 0,          "SaleChangePrice": 0,          "SaleDelayFee": 0,          "SaleInsurePrice": 0,          "SaleOtherFee": 0,          "SaleRebate": 0,          "SaleRefundFee": 0,          "SaleServiceFee": 0,          "SaleSum": -1118,          "SaleTicketPrice": -720,          "SaleTicketTax": -398        }      ],      "Paylogs": null,      "Pnr": {        "BigPnrCode": "PX3H4Y",        "GdsName": "TravelSky",        "Id": "1523815",        "OfficeNo": "CKG177",        "PnrCode": "KY302Z",        "Source": "BySale",        "SourceNo": "202003131404370512"      },      "ReceivedAmount": 0,      "RefundBuyOrderNo": "202005121046130012",      "RefundStatus": "NonePay",      "RefundType": null,      "SubmitStatus": "NotSubmit"    }  ],  "BuyPnr": "",  "CancelReason": null,  "Contact": {    "Email": "qunaer@qq.com",    "Name": "去哪儿固定联系人",    "Phone": "15730076283",    "Tel": "888888"  },  "CreateDepartment": null,  "CreationTime": "2020-05-12T10:46:13.1516997",  "CreatorName": "Api_ImportOrder(Api_ImportOrder)",  "DeliveryInfo": "",  "ExchangeRate": 1,  "Id": 68797,  "IntlFlag": true,  "IsAbandon": false,  "IsVoluntary": false,  "KeepSeat": true,  "NeedDelivery": false,  "OrganizationUnitName": "国际机票┝正航组┝去哪儿组",  "OuterSaleOderId": "ysi200313140335837eb5e9",  "Passengers": [    {      "AirRax": 0,      "BuyAdjustPrice": 0,      "BuyAdjustServiceFee": 0,      "BuyAgencyFee": 0,      "BuyAirRax": 0,      "BuyCashBack": 0,      "BuyChangePrice": 0,      "BuyDelayFee": 0,      "BuyInsurePrice": 0,      "BuyOtherFee": 0,      "BuyRebate": 0,      "BuyRefundFee": 0,      "BuyServiceFee": 0,      "BuySum": -1148,      "BuyTaxDetail": "",      "BuyTicketPrice": -750,      "BuyTicketTax": -398,      "CertNo": "TZ1276596",      "CertType": "Passport",      "Id": 96193,      "Name": "TAKEDA/AMIME",      "PassengerType": "Adult",      "PassengerVoyages": [        {          "Id": 1491455,          "TicketNo": "7843397179293",          "VoyageId": 2385173        }      ],      "SaleAdjustPrice": 0,      "SaleAdjustServiceFee": 0,      "SaleAgencyFee": 0,      "SaleCashBack": 0,      "SaleChangePrice": 0,      "SaleDelayFee": 0,      "SaleInsurePrice": 0,      "SaleOtherFee": 0,      "SaleRebate": 0,      "SaleRefundFee": 0,      "SaleServiceFee": 0,      "SaleSum": -1118,      "SaleTicketPrice": -720,      "SaleTicketTax": -398    }  ],  "PassengersName": "TAKEDA/AMIME",  "Paylogs": [  ],  "Pnr": {    "BigPnrCode": "PX3H4Y",    "GdsName": "TravelSky",    "Id": "1523815",    "OfficeNo": "CKG177",    "PnrCode": "KY302Z",    "Source": "BySale",    "SourceNo": "202003131404370512"  },  "ProfitCenters": {    "Code": "00030002",    "DepartmentCodeList": "|202|120|",    "DepartmentNameList": "票务国际机票┝正航组┝去哪儿组,畅游国际机票┝正航组┝去哪儿组",    "Id": "201811081627290003",    "Name": "国际正航去哪儿组",    "Params": {      "AsmsAcount": "9690",      "AsmsPwd": "For123",      "Dh": "",      "Sj": "18983760075",      "UserId": "9639",      "Xm": "叶旺",      "Yx": "",      "id": null    },    "Remark": "去哪国际、去哪特惠、去哪畅游国际",    "SubsetList": null,    "id": "201811081627290003"  },  "Reason": "因航班取消延误，申请全退",  "ReceivedAmount": 0,  "RefundAmount": 0,  "RefundOrderNo": "202005121046130012",  "RefundStatus": "NonePay",  "Remark": "",  "SaleAmount": -1118,  "SaleCurrency": "CNY",  "SaleForeignAmount": -1118,  "SalePnr": "KY302Z",  "Status": "Checked",  "TicketNo": "7843397179293",  "Voyages": [    {      "Airline": "CZ",      "ArrAirport": "NRT",      "ArrTerminal": "T1",      "ArrTime": "2020-06-30T13:25:00+08:00",      "Cabin": "T",      "DepAirport": "PVG",      "DepTerminal": "T1",      "DepTime": "2020-06-30T09:05:00+08:00",      "FlightNo": "CZ6051",      "Id": 2385173,      "SegmentRph": 1    }  ]}',
+      PNR: "1223",
+      PNRChanged: "KY302Z",
+      PassengerName: "TAKEDA/AMIME",
+      PlatformOrderNo: "123456",
+      PurchaseID: "68808",
+      RealRefundPrice: "",
+      RefundAccount: "",
+      RefundChannel: "wiken_test",
+      RefundMsg: "20200521T11:45:37:退票成功|就是成功了",
+      RefundPrice: -1148,
+      RefundReason: "因航班取消延误，申请全退",
+      RefundStatus: "退票成功",
+      RefundTime: "2020-05-12T18:46:13+08:00",
+      RefundType: "自愿",
+      SubmitTime: "2020-05-12T18:46:13+08:00",
+      TicketNos: "7843397179293,0",
+      UpdateTime: "2020-05-21T11:45:38+08:00",
+      VoyageInfos: "PVG-NRT",
+      YATPOrderNo: "68797"
+    });
   }
 };
 </script>
@@ -567,7 +700,7 @@ export default {
     font-size: 16px;
     background: #0070e2;
     margin-bottom: 15px;
-    color: #fff;
+    color: rgba(255, 255, 255, 0.8);
     .logo {
       height: 40px;
       margin-right: 2%;
@@ -577,7 +710,7 @@ export default {
       }
     }
     &:hover .drawer_btn:not(:hover) {
-      opacity: 0.5;
+      opacity: 0.7;
     }
     .drawer_btn {
       font-size: 16px;
@@ -661,6 +794,30 @@ export default {
         text-overflow: ellipsis;
         -webkit-line-clamp: 1;
         word-break: break-all;
+      }
+    }
+
+    .table_setting {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+
+    .jumpDetalis {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      line-height: 15px;
+      .newPnrText {
+        font-size: 12px;
+        &::before {
+          content: "新";
+          display: inline-block;
+          margin-right: 3px;
+        }
       }
     }
   }

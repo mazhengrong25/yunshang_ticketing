@@ -15,7 +15,7 @@
           <configFileTemplate ref="getConfigData"></configFileTemplate>
         </el-tab-pane>
         <el-tab-pane label="渠道office号" name="officeNo">
-          <officeTemplate></officeTemplate>
+          <officeTemplate ref="officeNoData"></officeTemplate>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -51,6 +51,8 @@ export default {
         this.$refs.getSettingData.getDataList();
       } else if (tab.name === "configFile") {
         this.$refs.getConfigData.getDataList();
+      }else if (tab.name === "officeNo") {
+        this.$refs.officeNoData.getDataList();
       }
     }
   }
