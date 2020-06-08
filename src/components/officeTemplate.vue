@@ -54,10 +54,10 @@
         </el-form-item>
         </el-form>
     
-      <span slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="officeDialog = false">关 闭</el-button>
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
+      </div>
     </el-dialog>
   </div>
 </template>

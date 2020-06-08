@@ -112,7 +112,7 @@
           <template slot-scope="scope">
             <div class="table_setting" style="display: flex">
               <el-button size="mini" @click="updateBtn(scope.row)" class="table_setting_ico" type="primary">更新</el-button>
-            <el-button size="mini" @click="updateBtn(scope.row)" class="table_setting_ico" type="warning">再提</el-button>
+            <el-button size="mini" @click="updateAgainBtn(scope.row)" class="table_setting_ico" type="warning">再提</el-button>
             </div>
           </template>
         </ex-table-column>
@@ -364,20 +364,73 @@
       custom-class="update_setting"
       title="更新退票状态"
       :visible.sync="updateSettingDialog"
-      width="400px"
+      width="600px"
     >
       <div class="update_setting_main">
-        <el-form ref="form" label-width="80px">
-          <el-form-item label="活动名称">
+        <el-form ref="form" label-width="140px">
+          <!-- <el-form-item label="">
             <el-input v-model="updateSetting.buyOrders"></el-input>
+          </el-form-item> -->
+
+          <el-form-item label="">
+            <el-switch
+              v-model="updateSetting.intlFlag"
+              active-text="国际"
+              inactive-text="国内">
+            </el-switch>
+          </el-form-item>
+          
+
+          <el-form-item label="平台退票单号">
+            <el-input v-model="updateSetting.platformRefundId"></el-input>
           </el-form-item>
 
+          <el-form-item label="平台退票单号">
+            <el-input v-model="updateSetting.platformRefundId"></el-input>
+          </el-form-item>
+
+          <el-form-item label="状态">
+            <el-input v-model="updateSetting.status"></el-input>
+          </el-form-item>
+
+
+          <el-form-item label="YATP 退票单号">
+            <el-input v-model="updateSetting.yatpRefundId"></el-input>
+          </el-form-item>
 
 
         </el-form>
 
       </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="updateSettingDialog = false">关 闭</el-button>
+        <el-button type="primary" @click="updateSettingDialog = false">确 定</el-button>
+      </div>
     </el-dialog>
+
+
+
+    <el-dialog
+      custom-class="update_setting"
+      title="再次提交"
+      :visible.sync="updateAgainSettingDialog"
+      width="600px"
+    >
+      <div class="update_setting_main">
+        <el-form ref="form" label-width="140px">
+          
+
+        </el-form>
+
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="updateAgainSettingDialog = false">关 闭</el-button>
+        <el-button type="primary" @click="updateAgainSettingDialog = false">确 定</el-button>
+      </div>
+    </el-dialog>
+
+
+
   </div>
 </template>
 
@@ -449,6 +502,8 @@ export default {
 
       updateSettingDialog: false, // 更新退票状态
       updateSetting: {}, // 更新状态数据
+
+      updateAgainSettingDialog: false, // 再次提交弹窗
     };
   },
   methods: {
@@ -627,17 +682,32 @@ export default {
 
     updateBtn(data) {
       console.log(data);
+      this.updateSettingDialog = true
     },
 
     /**
-     * @description: 跳转详情
-     * @param {type}
-     * @return:
-     */
+     * @description: 再次提交数据
+     * @param {type} 
+     * @return: 
+     */    
+    updateAgainBtn(data){
+      console.log(data);
+      this.updateAgainSettingDialog = true
+    },
+
+    /**
+     * @Description: 跳转详情
+     * @author Wish
+     * @date 2020/6/8
+    */
     jumpDetails(val) {
       console.log(val);
       let routeData = this.$router.resolve({
         path: "/settingDetails",
+        query: {
+          id: val.ID,
+          time: val.SubmitTime
+        }
       });
       window.open(routeData.href, '_blank');
     }
