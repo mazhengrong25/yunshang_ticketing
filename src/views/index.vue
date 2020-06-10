@@ -89,6 +89,12 @@
       </div>
     </div>
 
+
+    <div class="tools_header">
+      <el-button size="mini">导出模板</el-button>
+
+    </div>
+
     <div class="main_table">
       <el-table
         v-el-table-infinite-scroll="load"
@@ -104,15 +110,15 @@
       >
         <ex-table-column type="selection" width="40" align="center"></ex-table-column>
 
-        <ex-table-column 
+        <ex-table-column
         align="center"
-         :autoFit="true" 
-         width="130"
+         :autoFit="true"
+         width="65"
          label="操作">
           <template slot-scope="scope">
             <div class="table_setting" style="display: flex">
               <el-button size="mini" @click="updateBtn(scope.row)" class="table_setting_ico" type="primary">更新</el-button>
-            <el-button size="mini" @click="updateAgainBtn(scope.row)" class="table_setting_ico" type="warning">再提</el-button>
+<!--            <el-button size="mini" @click="updateAgainBtn(scope.row)" class="table_setting_ico" type="warning">再提</el-button>-->
             </div>
           </template>
         </ex-table-column>
@@ -725,36 +731,40 @@ export default {
   },
   mounted() {
     this.getChannelList();
+    window.addEventListener('storage', (e) => {
+      console.log(e)
+      this.getData();
+      localStorage.clear()
+    })
 
     this.dataList.push({
       Attachment: "",
       ChannelType: "BOP",
-      Headers: "",
-      ID: 1,
+      Headers: '{"Header":{"biz_source":null,"exchangeName":"YS.机票.退票","message_key":"Id","message_num":"1","message_type":"refund_order_buy_notsubmit","message_value":"73539","process_id":"b9c53503-262d-402f-9eca-96e5912651f7","process_stage":null,"replyTo":"ys.buychannel.refund.callBack","reservation_key":null,"reservation_type":null,"trace_id":null},"ReplyTo":"","CorrelationID":"","MessageID":"ef0e9073-b28a-4489-ace7-a9f8d33a4e8d","Extra":null}',
+      ID: 17,
       OperateDepartment: "国际机票┝正航组┝去哪儿组",
-      Operator: "国际机票┝正航组┝综合组┝出票/退改┠张媚(9682)",
-      OriginalData:
-        '{  "ApiInfo": null,  "Attachments": [  ],  "AuditorName": "国际机票┝正航组┝综合组┝出票/退改┠张媚(9682)",  "AuditorTime": "2020-05-12T11:03:02.8407853",  "BuyAmount": -1148,  "BuyOrders": [    {      "BuyAmount": -1148,      "BuyChannel": {        "Account": "CKG177",        "AccountAbbr": "CKG177|CKG177",        "ChannelInt": null,        "ChannelType": "BOP",        "ChannelTypeName": "BOP",        "Id": 24,        "Name": "wiken_test",        "NameAbbr": "BOP_CKG177|BOP_CKG177",        "OrderCapacity": "It",        "Organization": null,        "OrganizationId": null,        "PaymentId": 166,        "PaymentName": "BOP_CKG177",        "Remark": "",        "SaleBuyCapacity": "Buy"      },      "BuyForeignAmount": -1148,      "CreationTime": "2020-05-12T10:46:13.1986257",      "Currency": "CNY",      "ExchangeRate": 1,      "ExtensionData": "{"SubmitMsg":"申请提交__2020-05-13 10:52:04┠ ()@_@提交失败__2020-05-13 10:33:53__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:33:38┠ ()@_@提交失败__2020-05-13 10:33:03__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:32:47┠ ()@_@","SubmitUser":"()","SubmitTime":"2020-05-13 10:52:04"}",      "GdsName": "TravelSky",      "Id": 68808,      "IsVoluntary": true,      "OfficeNo": "CKG177",      "OuterBuyOderId": null,      "Passengers": [        {          "AirRax": 0,          "BuyAdjustPrice": 0,          "BuyAdjustServiceFee": 0,          "BuyAgencyFee": 0,          "BuyAirRax": 0,          "BuyCashBack": 0,          "BuyChangePrice": 0,          "BuyDelayFee": 0,          "BuyInsurePrice": 0,          "BuyOtherFee": 0,          "BuyRebate": 0,          "BuyRefundFee": 0,          "BuyServiceFee": 0,          "BuySum": -1148,          "BuyTaxDetail": "",          "BuyTicketPrice": -750,          "BuyTicketTax": -398,          "CertNo": "TZ1276596",          "CertType": "Passport",          "Id": 96193,          "Name": "TAKEDA/AMIME",          "PassengerType": "Adult",          "PassengerVoyages": [            {              "Id": 1491455,              "TicketNo": "7843397179293",              "VoyageId": 2385173            }          ],          "SaleAdjustPrice": 0,          "SaleAdjustServiceFee": 0,          "SaleAgencyFee": 0,          "SaleCashBack": 0,          "SaleChangePrice": 0,          "SaleDelayFee": 0,          "SaleInsurePrice": 0,          "SaleOtherFee": 0,          "SaleRebate": 0,          "SaleRefundFee": 0,          "SaleServiceFee": 0,          "SaleSum": -1118,          "SaleTicketPrice": -720,          "SaleTicketTax": -398        }      ],      "Paylogs": null,      "Pnr": {        "BigPnrCode": "PX3H4Y",        "GdsName": "TravelSky",        "Id": "1523815",        "OfficeNo": "CKG177",        "PnrCode": "KY302Z",        "Source": "BySale",        "SourceNo": "202003131404370512"      },      "ReceivedAmount": 0,      "RefundBuyOrderNo": "202005121046130012",      "RefundStatus": "NonePay",      "RefundType": null,      "SubmitStatus": "NotSubmit"    },    {      "BuyAmount": -1148,      "BuyChannel": {        "Account": "CKG177",        "AccountAbbr": "CKG177|CKG177",        "ChannelInt": null,        "ChannelType": "BOP",        "ChannelTypeName": "BOP",        "Id": 24,        "Name": "wiken_test",        "NameAbbr": "BOP_CKG177|BOP_CKG177",        "OrderCapacity": "It",        "Organization": null,        "OrganizationId": null,        "PaymentId": 166,        "PaymentName": "BOP_CKG177",        "Remark": "",        "SaleBuyCapacity": "Buy"      },      "BuyForeignAmount": -1148,      "CreationTime": "2020-05-12T10:46:13.1986257",      "Currency": "CNY",      "ExchangeRate": 1,      "ExtensionData": "{"SubmitMsg":"申请提交__2020-05-13 10:52:04┠ ()@_@提交失败__2020-05-13 10:33:53__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:33:38┠ ()@_@提交失败__2020-05-13 10:33:03__7:没有TicketRefund权限!@_@申请提交__2020-05-13 10:32:47┠ ()@_@","SubmitUser":"()","SubmitTime":"2020-05-13 10:52:04"}",      "GdsName": "TravelSky",      "Id": 68807,      "IsVoluntary": true,      "OfficeNo": "CKG177",      "OuterBuyOderId": null,      "Passengers": [        {          "AirRax": 0,          "BuyAdjustPrice": 0,          "BuyAdjustServiceFee": 0,          "BuyAgencyFee": 0,          "BuyAirRax": 0,          "BuyCashBack": 0,          "BuyChangePrice": 0,          "BuyDelayFee": 0,          "BuyInsurePrice": 0,          "BuyOtherFee": 0,          "BuyRebate": 0,          "BuyRefundFee": 0,          "BuyServiceFee": 0,          "BuySum": -1148,          "BuyTaxDetail": "",          "BuyTicketPrice": -750,          "BuyTicketTax": -398,          "CertNo": "TZ1276596",          "CertType": "Passport",          "Id": 96193,          "Name": "TAKEDA/AMIME",          "PassengerType": "Adult",          "PassengerVoyages": [            {              "Id": 1491455,              "TicketNo": "7843397179294",              "VoyageId": 2385173            }          ],          "SaleAdjustPrice": 0,          "SaleAdjustServiceFee": 0,          "SaleAgencyFee": 0,          "SaleCashBack": 0,          "SaleChangePrice": 0,          "SaleDelayFee": 0,          "SaleInsurePrice": 0,          "SaleOtherFee": 0,          "SaleRebate": 0,          "SaleRefundFee": 0,          "SaleServiceFee": 0,          "SaleSum": -1118,          "SaleTicketPrice": -720,          "SaleTicketTax": -398        }      ],      "Paylogs": null,      "Pnr": {        "BigPnrCode": "PX3H4Y",        "GdsName": "TravelSky",        "Id": "1523815",        "OfficeNo": "CKG177",        "PnrCode": "KY302Z",        "Source": "BySale",        "SourceNo": "202003131404370512"      },      "ReceivedAmount": 0,      "RefundBuyOrderNo": "202005121046130012",      "RefundStatus": "NonePay",      "RefundType": null,      "SubmitStatus": "NotSubmit"    }  ],  "BuyPnr": "",  "CancelReason": null,  "Contact": {    "Email": "qunaer@qq.com",    "Name": "去哪儿固定联系人",    "Phone": "15730076283",    "Tel": "888888"  },  "CreateDepartment": null,  "CreationTime": "2020-05-12T10:46:13.1516997",  "CreatorName": "Api_ImportOrder(Api_ImportOrder)",  "DeliveryInfo": "",  "ExchangeRate": 1,  "Id": 68797,  "IntlFlag": true,  "IsAbandon": false,  "IsVoluntary": false,  "KeepSeat": true,  "NeedDelivery": false,  "OrganizationUnitName": "国际机票┝正航组┝去哪儿组",  "OuterSaleOderId": "ysi200313140335837eb5e9",  "Passengers": [    {      "AirRax": 0,      "BuyAdjustPrice": 0,      "BuyAdjustServiceFee": 0,      "BuyAgencyFee": 0,      "BuyAirRax": 0,      "BuyCashBack": 0,      "BuyChangePrice": 0,      "BuyDelayFee": 0,      "BuyInsurePrice": 0,      "BuyOtherFee": 0,      "BuyRebate": 0,      "BuyRefundFee": 0,      "BuyServiceFee": 0,      "BuySum": -1148,      "BuyTaxDetail": "",      "BuyTicketPrice": -750,      "BuyTicketTax": -398,      "CertNo": "TZ1276596",      "CertType": "Passport",      "Id": 96193,      "Name": "TAKEDA/AMIME",      "PassengerType": "Adult",      "PassengerVoyages": [        {          "Id": 1491455,          "TicketNo": "7843397179293",          "VoyageId": 2385173        }      ],      "SaleAdjustPrice": 0,      "SaleAdjustServiceFee": 0,      "SaleAgencyFee": 0,      "SaleCashBack": 0,      "SaleChangePrice": 0,      "SaleDelayFee": 0,      "SaleInsurePrice": 0,      "SaleOtherFee": 0,      "SaleRebate": 0,      "SaleRefundFee": 0,      "SaleServiceFee": 0,      "SaleSum": -1118,      "SaleTicketPrice": -720,      "SaleTicketTax": -398    }  ],  "PassengersName": "TAKEDA/AMIME",  "Paylogs": [  ],  "Pnr": {    "BigPnrCode": "PX3H4Y",    "GdsName": "TravelSky",    "Id": "1523815",    "OfficeNo": "CKG177",    "PnrCode": "KY302Z",    "Source": "BySale",    "SourceNo": "202003131404370512"  },  "ProfitCenters": {    "Code": "00030002",    "DepartmentCodeList": "|202|120|",    "DepartmentNameList": "票务国际机票┝正航组┝去哪儿组,畅游国际机票┝正航组┝去哪儿组",    "Id": "201811081627290003",    "Name": "国际正航去哪儿组",    "Params": {      "AsmsAcount": "9690",      "AsmsPwd": "For123",      "Dh": "",      "Sj": "18983760075",      "UserId": "9639",      "Xm": "叶旺",      "Yx": "",      "id": null    },    "Remark": "去哪国际、去哪特惠、去哪畅游国际",    "SubsetList": null,    "id": "201811081627290003"  },  "Reason": "因航班取消延误，申请全退",  "ReceivedAmount": 0,  "RefundAmount": 0,  "RefundOrderNo": "202005121046130012",  "RefundStatus": "NonePay",  "Remark": "",  "SaleAmount": -1118,  "SaleCurrency": "CNY",  "SaleForeignAmount": -1118,  "SalePnr": "KY302Z",  "Status": "Checked",  "TicketNo": "7843397179293",  "Voyages": [    {      "Airline": "CZ",      "ArrAirport": "NRT",      "ArrTerminal": "T1",      "ArrTime": "2020-06-30T13:25:00+08:00",      "Cabin": "T",      "DepAirport": "PVG",      "DepTerminal": "T1",      "DepTime": "2020-06-30T09:05:00+08:00",      "FlightNo": "CZ6051",      "Id": 2385173,      "SegmentRph": 1    }  ]}',
-      PNR: "1223",
-      PNRChanged: "KY302Z",
-      PassengerName: "TAKEDA/AMIME",
-      PlatformOrderNo: "123456",
-      PurchaseID: "68808",
+      Operator: "Api_ImportOrder(Api_ImportOrder)",
+      OriginalData: '{"ApiInfo":null,"Attachments":[],"AuditorName":"国际机票┝正航组┝综合组┝出票/退改┠张媚(9682)","AuditorTime":"2020-06-09T17:11:17.6158236","BuyAmount":-969,"BuyOrders":[{"IsVoluntary":false,"RefundBuyOrderNo":"202006091459140025","OuterBuyOderId":"","BuyChannel":{"Account":"CKG177","AccountAbbr":"CKG177|CKG177","ChannelInt":"","ChannelType":"BOP","ChannelTypeName":"BOP","SaleBuyCapacity":"Buy","OrderCapacity":"It","Name":"BOP_CKG177","NameAbbr":"BOP_CKG177|BOP_CKG177","Remark":"","Organization":"","OrganizationId":"","PaymentId":166,"PaymentName":"BOP_CKG177","Id":24},"Pnr":{"BigPnrCode":"PX9HM0","GdsName":"TravelSky","Id":"1539545","OfficeNo":"CKG177","PnrCode":"HQK49C","Source":"BySale","SourceNo":"202004131407590010"},"GdsName":"TravelSky","OfficeNo":"CKG177","Currency":"CNY","ExchangeRate":1,"BuyAmount":-969,"BuyForeignAmount":-969,"ReceivedAmount":0,"RefundType":"","SubmitStatus":"NotSubmit","RefundStatus":"NonePay","Passengers":[{"PassengerId":null,"ChangePassengerId":"","PassengerVoyages":[{"TicketNo":"8263397318383","Id":1509393,"VoyageId":2408952}],"RefundCenterDETR":"{\"blackScreen\":\"{\\\"UsedFare\\\":0.0,\\\"Taxs\\\":{\\\"CN\\\":90.00,\\\"YQ\\\":29.00,\\\"YR\\\":280.00},\\\"Data\\\":{\\\"PassengerName\\\":\\\"QIN/SAI MS\\\",\\\"Endorsement\\\":\\\"Q/NON-END/PENALTY\\\",\\\"OldTicketNo\\\":\\\"\\\",\\\"TripInfos\\\":[{\\\"TripCode\\\":\\\"O\\\",\\\"TripNo\\\":\\\"1\\\",\\\"Airline\\\":\\\"GS\\\",\\\"FlightNo\\\":\\\"\\\",\\\"Cabin\\\":\\\"N\\\",\\\"CabinMark\\\":null,\\\"FromCity\\\":\\\"TSN\\\",\\\"FromAirport\\\":\\\"TSN\\\",\\\"ToCity\\\":\\\"TYO\\\",\\\"ToAirport\\\":\\\"HND\\\",\\\"FormTerminal\\\":\\\"T1\\\",\\\"ToTerminal\\\":\\\"L\\\",\\\"TicketNoStatus\\\":\\\"OPEN FOR USE\\\",\\\"FlightDate\\\":\\\"\\\",\\\"FareBasis\\\":\\\"NLOW1CN\\\",\\\"DepartureTime\\\":\\\"\\\",\\\"ArrivalTime\\\":\\\"\\\",\\\"Luggage\\\":\\\"1PC\\\",\\\"TicketNo\\\":\\\"8263397318383\\\",\\\"Pnr\\\":null}],\\\"itinerary\\\":null},\\\"CostInfo\\\":{\\\"Currency\\\":\\\"CNY\\\",\\\"ROEValue\\\":6.94997,\\\"NUCValue\\\":86.33,\\\"CNFee\\\":90.00,\\\"YQFee\\\":29.00,\\\"YRFee\\\":280.00,\\\"Taxs\\\":{\\\"CN\\\":90.00,\\\"YQ\\\":29.00,\\\"YR\\\":280.00},\\\"Price\\\":600.00,\\\"Tax\\\":399.00,\\\"AgencyFee\\\":5.0,\\\"EXCH\\\":null,\\\"CONJTKT\\\":\\\"\\\",\\\"IssueDate\\\":\\\"2020-04-13T00:00:00\\\",\\\"Pnr\\\":\\\"HQK49C\\\",\\\"TripList\\\":[{\\\"Airline\\\":\\\"GS\\\",\\\"FromAirport\\\":\\\"TSN\\\",\\\"ToAirport\\\":\\\"HND\\\",\\\"Share\\\":false,\\\"FlightNo\\\":\\\"7989\\\",\\\"Cabin\\\":\\\"N\\\",\\\"FlyDate\\\":\\\"2020-06-16 20:05\\\"}],\\\"TripPriceList\\\":[{\\\"Airline\\\":\\\"GS\\\",\\\"FromCity\\\":\\\"TSN\\\",\\\"ToCity\\\":\\\"TYO\\\",\\\"Share\\\":false,\\\"FlightNo\\\":\\\"7989\\\",\\\"Cabin\\\":\\\"N\\\",\\\"FlyDate\\\":\\\"2020-06-16 20:05\\\",\\\"QValue\\\":0.0,\\\"SValue\\\":0.0,\\\"OtherValue\\\":null,\\\"Value\\\":86.33,\\\"Mileage\\\":0}]},\\\"Error\\\":0,\\\"Message\\\":\\\"获取要退的税详情成功\\\",\\\"EtermStr\\\":[\\\"\\u003eDETR TN/8263397318383\\\",\\\"DETR TN/8263397318383\\\\t\\\\rISSUED BY: TIANJIN AIRLINES          ORG/DST: TSN/TYO                 BSP-I\\\\rE/R: Q/NON-END/PENALTY APPLY\\\\rTOUR CODE: INTJN2002A                                        \\\\rPASSENGER: QIN/SAI MS\\\\rEXCH:                               CONJ TKT: \\\\rO FM:1TSN GS    OPEN  N OPEN          NLOW1CN          /16JUN1 1PC OPEN FOR USE\\\\r     T1L  RL:                                                     IRR\\\\r  TO: HND\\\\rFARE:           CNY  600.00|FOP:CASH\\\\rTAX:            CNY 90.00CN|OI: \\\\rTAX:            CNY 29.00YQ|\\\\rTAX:            CNY280.00YR|\\\\rTOTAL:          CNY  999.00|TKTN: 826-3397318383\\\",\\\"\\u003ertkt 8263397318383\\\",\\\"    GRANT AVIATION                                      08316954                   Q/NON-END/PENALTY APPLY                 TSNTYO       YAKE                                                      13APR20  HQK49C/1E    CKG177                     QIN/SAI MS                                           DEV-10                                                                              52666  8UC O             TIANJIN       TSNGS  7989 N 16JUN 2005  OKNLOW1CN             16JUN1PC          TOKYO HANEDA AHND    VOID                                                       VOID                 VOID                                                       VOID                 VOID                                                       VOID                                                                          CNY  600.00A16JUN20TSN GS TYO86.33NUC86.33END ROE6.949970                                                                                                       CN    90.00                                                                     YQ    29.00                                                                     YR   280.00CASH(CNY)                                      INTJN2002A            CNY  999.00                                                                                    3397318383                CNY600.00            500 399.00\\\"],\\\"EtermTraffic\\\":6}\"}","Name":"QIN/SAI","PassengerType":"Adult","CertType":"Passport","CertNo":"E41284194","SaleTicketPrice":-568,"SaleTicketTax":-399,"SaleInsurePrice":0,"SaleChangePrice":0,"SaleAgencyFee":0,"SaleRebate":0,"SaleCashBack":0,"SaleAdjustPrice":0,"SaleServiceFee":0,"SaleAdjustServiceFee":0,"SaleDelayFee":0,"SaleOtherFee":0,"SaleSum":-967,"BuyTicketPrice":-600,"BuyTicketTax":-399,"BuyAgencyFee":30,"SaleRefundFee":0,"BuyRebate":0,"BuyCashBack":0,"BuyInsurePrice":0,"BuyChangePrice":0,"BuyAdjustPrice":0,"BuyServiceFee":0,"BuyAdjustServiceFee":0,"BuyDelayFee":0,"BuyRefundFee":0,"BuyOtherFee":0,"BuySum":-969,"BuyTaxDetail":"","Id":101939}],"Paylogs":"","CreationTime":"2020-06-09T14:59:14.4892252","Id":73548,"ExtensionData":"{\"TicketTime\":\"2020-04-13 15:07\",\"BuyRefundReason\":\"因航班取消延误，申请全退\",\"SubmitMsg\":\"申请提交__2020-06-10 09:47:27┠ 信息中心-坤昌┝研发部┝YATP组┠文康(7921)@_@\",\"SubmitUser\":\"信息中心-坤昌┝研发部┝YATP组┠文康(7921)\",\"SubmitTime\":\"2020-06-10 09:47:27\"}"}],"BuyPnr":"","CancelReason":null,"Contact":{"Email":"qunaer@qq.com","Name":"去哪儿固定联系人","Phone":"15730076283","Tel":"888888"},"CreateDepartment":null,"CreationTime":"2020-06-09T14:59:14.4579398","CreatorName":"Api_ImportOrder(Api_ImportOrder)","DeliveryInfo":"","ExchangeRate":1,"Id":73539,"IntlFlag":true,"IsAbandon":false,"IsVoluntary":false,"KeepSeat":true,"NeedDelivery":false,"OrganizationUnitName":"国际机票┝正航组┝去哪儿组","OuterSaleOderId":"ysi20041314073145259434","Passengers":[{"AirRax":0,"BuyAdjustPrice":0,"BuyAdjustServiceFee":0,"BuyAgencyFee":30,"BuyAirRax":0,"BuyCashBack":0,"BuyChangePrice":0,"BuyDelayFee":0,"BuyInsurePrice":0,"BuyOtherFee":0,"BuyRebate":0,"BuyRefundFee":0,"BuyServiceFee":0,"BuySum":-969,"BuyTaxDetail":"","BuyTicketPrice":-600,"BuyTicketTax":-399,"CertNo":"E41284194","CertType":"Passport","Id":101939,"Name":"QIN/SAI","PassengerType":"Adult","PassengerVoyages":[{"Id":1509393,"TicketNo":"8263397318383","VoyageId":2408952}],"SaleAdjustPrice":0,"SaleAdjustServiceFee":0,"SaleAgencyFee":0,"SaleCashBack":0,"SaleChangePrice":0,"SaleDelayFee":0,"SaleInsurePrice":0,"SaleOtherFee":0,"SaleRebate":0,"SaleRefundFee":0,"SaleServiceFee":0,"SaleSum":-967,"SaleTicketPrice":-568,"SaleTicketTax":-399}],"PassengersName":"QIN/SAI","Paylogs":[],"Pnr":{"BigPnrCode":"PX9HM0","GdsName":"TravelSky","Id":"1539545","OfficeNo":"CKG177","PnrCode":"HQK49C","Source":"BySale","SourceNo":"202004131407590010"},"ProfitCenters":{"Code":"00030002","DepartmentCodeList":"|202|120|","DepartmentNameList":"票务国际机票┝正航组┝去哪儿组,畅游国际机票┝正航组┝去哪儿组","Id":"201811081627290003","Name":"国际正航去哪儿组","Params":{"AsmsAcount":"9690","AsmsPwd":"For123","Dh":"","Sj":"18983760075","UserId":"9639","Xm":"叶旺","Yx":"","id":null},"Remark":"去哪国际、去哪特惠、去哪畅游国际","SubsetList":null,"id":"201811081627290003"},"Reason":"因航班取消延误，申请全退","ReceivedAmount":0,"RefundAmount":0,"RefundOrderNo":"202006091459140025","RefundStatus":"NonePay","Remark":"","SaleAmount":-967,"SaleCurrency":"CNY","SaleForeignAmount":-967,"SalePnr":"HQK49C","Status":"Checked","TicketNo":"8263397318383","Voyages":[{"Airline":"GS","ArrAirport":"HND","ArrTerminal":"T1","ArrTime":"2020-06-17T00:05:00","Cabin":"N","DepAirport":"TSN","DepTerminal":"T1","DepTime":"2020-06-16T20:05:00","FlightNo":"GS7989","Id":2408952,"SegmentRph":1}]}',
+      PNR: "HQK49C",
+      PNRChanged: "QQQQQ",
+      PassengerName: "QIN/SAI",
+      PlatformOrderNo: "",
+      PurchaseID: "73548",
       RealRefundPrice: "",
       RefundAccount: "",
-      RefundChannel: "wiken_test",
-      RefundMsg: "20200521T11:45:37:退票成功|就是成功了",
-      RefundPrice: -1148,
+      RefundChannel: "BOP_CKG177",
+      RefundMsg: "20200610T100823:退票成功|退票操作成功",
+      RefundPrice: -969,
       RefundReason: "因航班取消延误，申请全退",
       RefundStatus: "退票成功",
-      RefundTime: "2020-05-12T18:46:13+08:00",
-      RefundType: "自愿",
-      SubmitTime: "2020-05-12T18:46:13+08:00",
-      TicketNos: "7843397179293,0",
-      UpdateTime: "2020-05-21T11:45:38+08:00",
-      VoyageInfos: "PVG-NRT",
-      YATPOrderNo: "68797"
-    });
+      RefundTime: "2020-06-09T22:59:14+08:00",
+      RefundType: "非自愿",
+      SubmitTime: "2020-06-09T22:59:14+08:00",
+      TicketNos: "8263397318383,0",
+      UpdateTime: "2020-06-10T10:08:24+08:00",
+      VoyageInfos: "TSN-HND",
+      YATPOrderNo: "73539",
+    })
   }
 };
 </script>
@@ -841,6 +851,10 @@ export default {
         margin-right: 10px;
       }
     }
+  }
+  .tools_header{
+    display: flex;
+    padding: 5px 20px;
   }
   .main_table {
     margin-top: 10px;

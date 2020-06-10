@@ -26,6 +26,7 @@ import {
   Col,
   Link,
   Tooltip,
+  Card,
   Message } from 'element-ui';
 
 Vue.use(Button)
@@ -48,6 +49,7 @@ Vue.use(Row)
 Vue.use(Col)
 Vue.use(Link)
 Vue.use(Tooltip)
+Vue.use(Card)
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;
