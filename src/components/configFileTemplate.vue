@@ -6,30 +6,70 @@
       type="primary"
       @click.native="openConfigDialog('add')"
     >新增</el-button>
-    <el-table :data="configList" border style="width: 100%">
+    <el-table
+      :data="configList"
+      border
+      row-key="nuc_type"
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+      style="width: 100%">
+      <el-table-column label="NUC状态" width="140">
+        <template scope="scope">
+          <span v-if="scope.row.type">
+            {{scope.row.nuc_type}}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="air_company" label="航司名称"></el-table-column>
       <el-table-column prop="air_company_code" label="航司二字码"></el-table-column>
+      <el-table-column label="是否可用" width="80" align="center">
+        <template slot-scope="scope">
+          <el-switch
+            v-if="!scope.row.type"
+            v-model="scope.row.is_using"
+            @change="checkedUsing(scope.row.is_using,scope.row)"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </template>
+      </el-table-column>
+
       <el-table-column prop="airline" label="航线"></el-table-column>
       <el-table-column prop="airline_scope" label="航线范围"></el-table-column>
       <el-table-column prop="code_for_free" label="豁免代码"></el-table-column>
-      <el-table-column prop="involuntary_channel" label="非自愿退票渠道"></el-table-column>
-      <el-table-column label="结算码">
-        <template slot-scope="scope">{{scope.row.IsSpecFile? '是': '否'}}</template>
+      <el-table-column prop="involuntary_channel" label="非自愿退票渠道" width="80" align="center"></el-table-column>
+      <el-table-column label="结算码" width="65" align="center">
+        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.IsSpecFile? '是': '否'}}</span></template>
       </el-table-column>
       <el-table-column label="适用全航司">
-        <template slot-scope="scope">{{scope.row.is_all_air_company? '适用': '不适用'}}</template>
+        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_all_air_company? '适用': '不适用'}}</span></template>
       </el-table-column>
       <el-table-column label="noShow票">
-        <template slot-scope="scope">{{scope.row.is_no_show? '是': '否'}}</template>
+        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_no_show? '是': '否'}}</span></template>
       </el-table-column>
-      <el-table-column prop="publish_time" label="发布日期"></el-table-column>
-      <el-table-column prop="takeoff_time" label="起飞时间段"></el-table-column>
-      <el-table-column prop="ticket_time" label="出票起始时间段"></el-table-column>
-      <el-table-column prop="validate_time" label="有效期"></el-table-column>
-      <el-table-column prop="voluntary_channel" label="自愿退票渠道"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="publish_time" label="发布日期">
         <template slot-scope="scope">
-          <div style="display: flex;">
+          <span v-if="!scope.row.type">{{$TimeSetting(scope.row.publish_time)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="takeoff_time" label="起飞时间段">
+        <template slot-scope="scope">
+          <span v-if="!scope.row.type">{{$TimeSetting(scope.row.publish_time)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="ticket_time" label="出票起始时间段">
+        <template slot-scope="scope">
+          <span v-if="!scope.row.type">{{$TimeSetting(scope.row.ticket_time)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="validate_time" label="有效期">
+        <template slot-scope="scope">
+          <span v-if="!scope.row.type">{{$TimeSetting(scope.row.validate_time)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="voluntary_channel" label="自愿退票渠道"></el-table-column>
+      <el-table-column label="操作" width="150" fixed="right">
+        <template slot-scope="scope">
+          <div style="display: flex;" v-if="!scope.row.type">
             <el-button size="mini" @click="openConfigDialog('edit',scope.row)">编辑</el-button>
             <el-button size="mini" @click="editCinfig(scope.row)">删除</el-button>
           </div>
@@ -213,6 +253,26 @@
         <el-button type="primary" @click="submitBtn">确 定</el-button>
       </div>
     </el-dialog>
+
+
+    <!--  警告弹窗  -->
+    <el-dialog
+      width="300px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :visible.sync="warningDialog"
+      title="警告"
+    >
+      <div>正在关闭当前航线，是否确定</div>
+      <div class="footer-dialog" slot="footer">
+        <el-button size="mini" @click="closeConfig(false)">取 消</el-button>
+        <el-button size="mini" type="primary" @click="closeConfig(true)">确 定</el-button>
+      </div>
+
+    </el-dialog>
+
+
   </div>
 </template>
 
@@ -239,8 +299,12 @@ export default {
       ],
       voluntary_channel: [
         { required: true, message: "请输入自愿退票渠道", trigger: "blur" }
-      ]
-    }
+      ],
+    },
+    warningDialog: false, // 警告弹窗
+
+    checkedStatus: {}, //  是否启用配置文件数据
+
   }),
   methods: {
     /**
@@ -250,9 +314,35 @@ export default {
      */
 
     getDataList() {
+      this.configList = []
       this.$axios.get("/config/configFile").then(res => {
         if (res.data.code === 0) {
-          this.configList = res.data.data;
+          let configData = res.data.data
+          let trueNuc = []
+          let falseNuc = []
+          configData.forEach((item,index) =>{
+            item.is_using = item.is_using === 'yes'
+            if(item.is_nuc){
+              item['nuc_type'] = 'nuc-' + index
+              trueNuc.push(item)
+            }else {
+              item['nuc_type'] = 'notNuc-' + index
+              falseNuc.push(item)
+            }
+          })
+          this.configList.push({
+            nuc_type: 'NUC文件',
+            type: 'menu',
+            children: trueNuc
+          },{
+            nuc_type: '不为NUC文件',
+            type: 'menu',
+            children: falseNuc
+          })
+
+          console.log(this.configList);
+
+
         } else {
           this.$message.warning(res.data.message);
         }
@@ -338,8 +428,50 @@ export default {
           this.getDataList()
         }
       });
-    }
-  }
+    },
+
+    /**
+     * @Description: 是否可用
+     * @author Wish
+     * @date 2020/6/11
+    */
+    checkedUsing(val,list){
+      this.checkedStatus  = {
+        configName: 'configFile',
+        isUsing: val? 'yes': 'no',
+        itemID: list.ID
+      }
+      if(!val){
+        this.warningDialog = true
+      }else {
+        this.closeConfig(true)
+      }
+
+    },
+
+    /**
+     * @Description: 配置文件确认关闭
+     * @author Wish
+     * @date 2020/6/12
+    */
+    closeConfig(type){
+      if(type){
+        this.$axios.post('/config/use',this.checkedStatus)
+          .then(res =>{
+            console.log(res);
+            if(res.data.code === 0){
+              this.$message.success(res.data.message)
+            }else {
+              this.$message.warning(res.data.message)
+              this.getDataList()
+            }
+          })
+      }else {
+        this.getDataList()
+      }
+      this.warningDialog = false
+    },
+  },
 };
 </script>
 

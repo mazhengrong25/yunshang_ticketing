@@ -9,6 +9,25 @@
       <div class="drawer_btn" @click="jumpRouter('/readme')">接口文档</div>
       <div class="drawer_btn" @click="jumpRouter('/swagger/index.html',true)">Swagger</div>
     </div>
+
+    <div class="main_header">
+      <el-radio-group v-model="statusCheck" @change="changeStatus" size="mini">
+        <el-radio-button label="全部">
+          全部：({{dataList.length}})
+        </el-radio-button>
+        <el-radio-button
+          v-for="(value, key, index) in statusListData"
+          :label="key"
+          :key="index">
+          {{key}}：({{value}})
+        </el-radio-button>
+      </el-radio-group>
+<!--      <div class="status_list" v-for="(value, key, index) in statusListData">-->
+<!--        -->
+<!--      </div>-->
+
+    </div>
+
     <div class="search_header">
       <div class="search_box search_name">
         <span>退票渠道：</span>
@@ -97,11 +116,12 @@
 
     <div class="main_table">
       <el-table
+        v-if="isTableAlive"
         v-el-table-infinite-scroll="load"
-        :data="dataList"
+        :data="dataList.filter(data => data.showStatus)"
         highlight-current-row
         stripe
-        height="calc(100vh - 116px)"
+        height="calc(100vh - 250px)"
         border
         size="small"
         @current-change="handleSelect"
@@ -118,7 +138,6 @@
           <template slot-scope="scope">
             <div class="table_setting" style="display: flex">
               <el-button size="mini" @click="updateBtn(scope.row)" class="table_setting_ico" type="primary">更新</el-button>
-<!--            <el-button size="mini" @click="updateAgainBtn(scope.row)" class="table_setting_ico" type="warning">再提</el-button>-->
             </div>
           </template>
         </ex-table-column>
@@ -378,17 +397,17 @@
             <el-input v-model="updateSetting.buyOrders"></el-input>
           </el-form-item> -->
 
-          <el-form-item label="">
-            <el-switch
-              v-model="updateSetting.intlFlag"
-              active-text="国际"
-              inactive-text="国内">
-            </el-switch>
-          </el-form-item>
+<!--          <el-form-item label="">-->
+<!--            <el-switch-->
+<!--              v-model="updateSetting.intlFlag"-->
+<!--              active-text="国际"-->
+<!--              inactive-text="国内">-->
+<!--            </el-switch>-->
+<!--          </el-form-item>-->
           
-
-          <el-form-item label="平台退票单号">
-            <el-input v-model="updateSetting.platformRefundId"></el-input>
+<!--          前端退票 -->
+          <el-form-item label="">
+            <el-input v-model="updateSetting.executorName"></el-input>
           </el-form-item>
 
           <el-form-item label="平台退票单号">
@@ -416,24 +435,24 @@
 
 
 
-    <el-dialog
-      custom-class="update_setting"
-      title="再次提交"
-      :visible.sync="updateAgainSettingDialog"
-      width="600px"
-    >
-      <div class="update_setting_main">
-        <el-form ref="form" label-width="140px">
-          
+<!--    <el-dialog-->
+<!--      custom-class="update_setting"-->
+<!--      title="再次提交"-->
+<!--      :visible.sync="updateAgainSettingDialog"-->
+<!--      width="600px"-->
+<!--    >-->
+<!--      <div class="update_setting_main">-->
+<!--        <el-form ref="form" label-width="140px">-->
+<!--          -->
 
-        </el-form>
+<!--        </el-form>-->
 
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="updateAgainSettingDialog = false">关 闭</el-button>
-        <el-button type="primary" @click="updateAgainSettingDialog = false">确 定</el-button>
-      </div>
-    </el-dialog>
+<!--      </div>-->
+<!--      <div slot="footer" class="dialog-footer">-->
+<!--        <el-button @click="updateAgainSettingDialog = false">关 闭</el-button>-->
+<!--        <el-button type="primary" @click="updateAgainSettingDialog = false">确 定</el-button>-->
+<!--      </div>-->
+<!--    </el-dialog>-->
 
 
 
@@ -449,6 +468,8 @@ export default {
   },
   data() {
     return {
+      isTableAlive: true, // 表格重载
+
       drawer: false, // 菜单
 
       searchData: {
@@ -510,9 +531,22 @@ export default {
       updateSetting: {}, // 更新状态数据
 
       updateAgainSettingDialog: false, // 再次提交弹窗
+
+      statusListData: {},  // 退票状态列表
+
+      statusCheck: '全部',  // 选中的退票状态
     };
   },
   methods: {
+    /**
+     * @Description: 重载
+     * @author Wish
+     * @date 2020/6/11
+     */
+    reload(){
+      this.isTableAlive = false
+      this.$nextTick(()=> this.isTableAlive = true)
+    },
     onChang(e) {
       this.$forceUpdate();
     },
@@ -553,14 +587,10 @@ export default {
        * @date 2020/3/13
        */
       if (this.orderTime) {
-        // if(thisDate >= new Date(this.orderTime[0]).getTime()){
-        //   this.$message.warning('请选择大于当前日期')
-        // }else {
         this.searchData["start_time"] = new Date(
           this.orderTime[0]
         ).toISOString();
         this.searchData["end_time"] = this.orderTime[1] + "T23:59:59.000Z";
-        // }
       } else {
         delete this.searchData.start_time;
         delete this.searchData.end_time;
@@ -575,12 +605,37 @@ export default {
             if (res.data.data && res.data.data.length > 0) {
               this.loadStatus = true;
               this.dataList = this.dataList.concat(res.data.data);
+
+              let statusList = []
+              this.dataList.forEach((item,index) =>{
+                statusList.push(item.RefundStatus)
+              })
+              //'未提交':0,'已提交':0,'退票失败':0,'退票成功':0,'已拒单':0,'线下退':0,'待确认':0,'取消复核':0,'销账':0
+              let statusObj = statusList.reduce((allNames, name) => {
+                if (name in allNames) {
+                  allNames[name]++;
+                } else {
+                  allNames[name] = 1;
+                }
+                return allNames;
+                }, {});
+              this.statusListData = {
+                '未提交': statusObj['未提交'] || 0,
+                '已提交': statusObj['已提交'] || 0,
+                '退票失败': statusObj['退票失败'] || 0,
+                '退票成功': statusObj['退票成功'] || 0,
+                '已拒单': statusObj['已拒单'] || 0,
+                '线下退': statusObj['线下退'] || 0,
+                '待确认': statusObj['待确认'] || 0,
+                '取消复核': statusObj['取消复核'] || 0,
+                '销账': statusObj['销账'] || 0,
+              }
+              this.changeStatus()
+
             } else {
               this.loadStatus = false;
               this.$message.warning("暂无更多数据");
             }
-
-            console.log(this.dataList);
           } else {
             this.$message.error(res.data.message);
           }
@@ -716,7 +771,25 @@ export default {
         }
       });
       window.open(routeData.href, '_blank');
-    }
+    },
+
+
+    /**
+     * @Description: 退票状态筛选
+     * @author Wish
+     * @date 2020/6/12
+    */
+    changeStatus(){
+      this.dataList.forEach((item,index) =>{
+        if(this.statusCheck === '全部'){
+          item.showStatus = true
+        }else {
+          item.showStatus = item.RefundStatus === this.statusCheck
+        }
+      })
+      this.reload()
+    },
+
   },
   filters: {
     pagination(dataList, pageNum, pageSize) {
@@ -802,6 +875,18 @@ export default {
       }
     }
   }
+
+  .main_header{
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 20px;
+    .status_list{
+      &:not(:last-child){
+        margin-right: 20px;
+      }
+    }
+  }
+
   .search_header {
     display: flex;
     align-items: center;
@@ -878,6 +963,12 @@ export default {
         text-overflow: ellipsis;
         -webkit-line-clamp: 1;
         word-break: break-all;
+      }
+    }
+    /deep/.el-table{
+      min-height: 400px;
+      .el-table__body-wrapper{
+        height: 100% !important;
       }
     }
 

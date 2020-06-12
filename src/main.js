@@ -27,6 +27,9 @@ import {
   Link,
   Tooltip,
   Card,
+  Divider,
+  RadioButton,
+  RadioGroup,
   Message } from 'element-ui';
 
 Vue.use(Button)
@@ -50,6 +53,9 @@ Vue.use(Col)
 Vue.use(Link)
 Vue.use(Tooltip)
 Vue.use(Card)
+Vue.use(Divider)
+Vue.use(RadioButton)
+Vue.use(RadioGroup)
 
 Vue.prototype.$message = Message;
 Vue.prototype.$msgbox = MessageBox;
