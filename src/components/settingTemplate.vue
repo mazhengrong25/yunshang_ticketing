@@ -16,6 +16,18 @@
     >
       <el-table-column width="200" show-overflow-tooltip prop="project" label="渠道类型"></el-table-column>
       <el-table-column label="渠道名称" width="300" show-overflow-tooltip prop="channel_name"></el-table-column>
+      <el-table-column label="是否可用" width="80">
+        <template v-slot="scope">
+          <el-switch
+            v-if="scope.row.type !== 'menu'"
+            v-model="scope.row.is_using"
+            @change="changeSetting(scope.row.is_using,scope.row)"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="退票渠道" width="80" show-overflow-tooltip prop="refund_channel"></el-table-column>
       <el-table-column
         align="center"
         width="100"
@@ -63,6 +75,9 @@
         <el-form-item label="渠道名称" prop="channel_name">
           <el-input v-model="ruleForm.channel_name"></el-input>
         </el-form-item>
+        <el-form-item label="退票渠道" prop="channel_name">
+          <el-input v-model="ruleForm.refund_channel"></el-input>
+        </el-form-item>
         <el-form-item label="请求方式" prop="request_way">
           <el-select
             style="width: 100%"
@@ -88,6 +103,23 @@
           <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
         </el-form-item>
       </el-form>
+    </el-dialog>
+
+    <!--  警告弹窗  -->
+    <el-dialog
+      width="300px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :visible.sync="warningDialog"
+      title="警告"
+    >
+      <div>正在关闭当前航线，是否确定</div>
+      <div class="footer-dialog" slot="footer">
+        <el-button size="mini" @click="closeConfig(false)">取 消</el-button>
+        <el-button size="mini" type="primary" @click="closeConfig(true)">确 定</el-button>
+      </div>
+
     </el-dialog>
   </div>
 </template>
@@ -123,6 +155,10 @@ export default {
         // 渠道名称
         { required: true, message: "请填写渠道名称", trigger: "blur" }
       ],
+      refund_channel: [
+        // 退票渠道
+        { required: true, message: "请填写退票渠道", trigger: "blur" }
+      ],
       request_way: [
         // 请求方式
         { required: true, message: "请选择请求方式", trigger: "change" }
@@ -148,7 +184,10 @@ export default {
 
     tableOpenName: "",
 
-    clickTableName: ["占位符"]
+    clickTableName: ["占位符"],
+
+    checkedStatus: {},
+    warningDialog: false
   }),
 
   methods: {
@@ -220,6 +259,7 @@ export default {
               : this.settingType === "edit"
               ? "/config/update"
               : "";
+          this.ruleForm['is_using'] = this.ruleForm['is_using']?'yes': 'no'
           this.$axios.post(url, this.ruleForm).then(res => {
             if (res.data.code === 0) {
               this.$message.success("保存成功");
@@ -266,26 +306,15 @@ export default {
     getDataList() {
       let data = {
         project: ""
-        // limit: this.limit,
-        // offset: this.offset,
       };
       this.$axios.post("/config/get", data).then(res => {
         if (res.data.code === 0) {
-          // if(this.loadStatus){
-          //   if(res.data.data.length> 0){
-          //     this.dataList = this.dataList.concat(res.data.data)
-          //   }else {
-          //     this.loadStatus = false
-          //     this.$message.warning('暂无更多数据')
-          //   }
-          // }else {
-          //
-          // }
           let settingData = res.data.data;
-
           if (settingData.length > 0) {
             const listArr = [];
             settingData.forEach((el, index) => {
+              console.log(el);
+              el.is_using = el.is_using === 'yes'
               for (let i = 0; i < listArr.length; i++) {
                 if (listArr[i].project === el.project) {
                   listArr[i].children.push(el);
@@ -310,7 +339,48 @@ export default {
           this.$message.warning(res.data.message);
         }
       });
-    }
+    },
+
+    /**
+     * @Description: 关闭配置
+     * @author Wish
+     * @date 2020/6/15
+    */
+    changeSetting(val,list){
+      this.checkedStatus  = {
+        configName: 'refundInterface',
+        isUsing: val? 'yes': 'no',
+        itemID: list.ID
+      }
+      if(!val){
+        this.warningDialog = true
+      }else {
+        this.closeConfig(true)
+      }
+    },
+
+    /**
+     * @Description: 配置文件确认关闭
+     * @author Wish
+     * @date 2020/6/12
+     */
+    closeConfig(type){
+      if(type){
+        this.$axios.post('/config/use',this.checkedStatus)
+          .then(res =>{
+            console.log(res);
+            if(res.data.code === 0){
+              this.$message.success(res.data.message)
+            }else {
+              this.$message.warning(res.data.message)
+              this.getDataList()
+            }
+          })
+      }else {
+        this.getDataList()
+      }
+      this.warningDialog = false
+    },
   },
 
   created() {

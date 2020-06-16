@@ -5,21 +5,27 @@
       size="small"
       type="primary"
       @click.native="openConfigDialog('add')"
-    >新增</el-button>
+    >新增
+    </el-button>
     <el-table
       :data="configList"
       border
       row-key="nuc_type"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       style="width: 100%">
-      <el-table-column label="NUC状态" width="140">
+      <!--      <el-table-column label="NUC状态" width="140">-->
+      <!--        -->
+      <!--      </el-table-column>-->
+      <el-table-column prop="air_company" label="航司名称">
         <template scope="scope">
           <span v-if="scope.row.type">
             {{scope.row.nuc_type}}
           </span>
+          <span v-if="!scope.row.type">
+            {{scope.row.air_company}}
+          </span>
         </template>
       </el-table-column>
-      <el-table-column prop="air_company" label="航司名称"></el-table-column>
       <el-table-column prop="air_company_code" label="航司二字码"></el-table-column>
       <el-table-column label="是否可用" width="80" align="center">
         <template slot-scope="scope">
@@ -36,12 +42,16 @@
       <el-table-column prop="airline" label="航线"></el-table-column>
       <el-table-column prop="airline_scope" label="航线范围"></el-table-column>
       <el-table-column prop="code_for_free" label="豁免代码"></el-table-column>
+      <el-table-column prop="ForFreeReason" label="豁免原因"></el-table-column>
+
+      <el-table-column prop="voluntary_channel" width="80" align="center" label="自愿退票渠道"></el-table-column>
       <el-table-column prop="involuntary_channel" label="非自愿退票渠道" width="80" align="center"></el-table-column>
       <el-table-column label="结算码" width="65" align="center">
         <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.IsSpecFile? '是': '否'}}</span></template>
       </el-table-column>
       <el-table-column label="适用全航司">
-        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_all_air_company? '适用': '不适用'}}</span></template>
+        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_all_air_company? '适用': '不适用'}}</span>
+        </template>
       </el-table-column>
       <el-table-column label="noShow票">
         <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_no_show? '是': '否'}}</span></template>
@@ -66,11 +76,11 @@
           <span v-if="!scope.row.type">{{$TimeSetting(scope.row.validate_time)}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="voluntary_channel" label="自愿退票渠道"></el-table-column>
-      <el-table-column label="操作" width="150" fixed="right">
+
+      <el-table-column align="center" label="操作" width="80" fixed="right">
         <template slot-scope="scope">
           <div style="display: flex;" v-if="!scope.row.type">
-            <el-button size="mini" @click="openConfigDialog('edit',scope.row)">编辑</el-button>
+            <!--            <el-button size="mini" @click="openConfigDialog('edit',scope.row)">编辑</el-button>-->
             <el-button size="mini" @click="editCinfig(scope.row)">删除</el-button>
           </div>
         </template>
@@ -100,7 +110,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="航司二字码">
+              <el-form-item label="航司二字码" prop="air_company_code">
                 <el-input clearable v-model="configForm.air_company_code"></el-input>
               </el-form-item>
             </el-col>
@@ -108,7 +118,7 @@
 
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="航线" prop="airline">
+              <el-form-item label="航线">
                 <el-input clearable v-model="configForm.airline"></el-input>
               </el-form-item>
             </el-col>
@@ -120,56 +130,38 @@
           </el-row>
 
           <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item label="豁免代码">
-                <el-input clearable v-model="configForm.code_for_free"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="扩展参数">
-                <el-input clearable v-model="configForm.extra"></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
 
-          <el-row :gutter="20">
+            <!--            <el-col :span="12">-->
+            <!--              <el-form-item label="扩展参数">-->
+            <!--                <el-input clearable v-model="configForm.extra"></el-input>-->
+            <!--              </el-form-item>-->
+            <!--            </el-col>-->
             <el-col :span="12">
               <el-form-item label="非自愿退票渠道" prop="involuntary_channel">
                 <el-input clearable v-model="configForm.involuntary_channel"></el-input>
               </el-form-item>
             </el-col>
-            <el-col :span="6">
-              <el-form-item label="结算码">
-                <el-switch
-                  v-model="configForm.isSpecFile"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949"
-                ></el-switch>
-              </el-form-item>
-            </el-col>
-
-            <el-col :span="6">
-              <el-form-item label="是否适用全航司">
-                <el-switch
-                  v-model="configForm.is_all_air_company"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949"
-                ></el-switch>
+            <el-col :span="12">
+              <el-form-item label="自愿退票渠道" prop="voluntary_channel">
+                <el-input clearable v-model="configForm.voluntary_channel"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
 
+          <!--          <el-row :gutter="20">-->
+
+          <!--          </el-row>-->
+
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="是否适用于no show">
-                <el-switch
-                  v-model="configForm.is_no_show"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949"
-                ></el-switch>
+              <el-form-item label="豁免代码">
+                <div style="display: inline-flex">
+                  <el-input style="width: 200px" clearable v-model="configForm.code_for_free_en"
+                            placeholder="前两位"></el-input>
+                  <el-input clearable v-model="configForm.code_for_free_number" placeholder="其他部分"></el-input>
+                </div>
               </el-form-item>
             </el-col>
-
             <el-col :span="12">
               <el-form-item label="发布日期">
                 <el-date-picker
@@ -180,6 +172,8 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
+
+
           </el-row>
 
           <el-row :gutter="20">
@@ -201,6 +195,7 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
+
             <el-col :span="12">
               <el-form-item label="出票起始时间段">
                 <!-- <el-date-picker
@@ -219,6 +214,8 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
+
+
           </el-row>
 
           <el-row :gutter="20">
@@ -240,9 +237,33 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
-              <el-form-item label="自愿退票渠道" prop="voluntary_channel">
-                <el-input clearable v-model="configForm.voluntary_channel"></el-input>
+
+
+            <el-col :span="4">
+              <el-form-item label="是否为NUC文件">
+                <el-switch
+                  v-model="configForm.is_nuc"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="是否适用全航司">
+                <el-switch
+                  v-model="configForm.is_all_air_company"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="是否适用于no show">
+                <el-switch
+                  v-model="configForm.is_no_show"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                ></el-switch>
               </el-form-item>
             </el-col>
           </el-row>
@@ -277,230 +298,246 @@
 </template>
 
 <script>
-export default {
-  name: "config_file",
-  data: () => ({
-    configList: [], //  获取
-    configDialog: false, // 弹窗
-    dialogTitleType: "", // 弹窗标题
+  export default {
+    name: "config_file",
+    data: () => ({
+      configList: [], //  获取
+      configDialog: false, // 弹窗
+      dialogTitleType: "", // 弹窗标题
 
-    configForm: {}, // 表单数据
-    rules: {
-      // 表单 验证
-      air_company: [
-        { required: true, message: "请输入航司名称", trigger: "blur" }
-      ],
-      airline: [{ required: true, message: "请输入航线", trigger: "blur" }],
-      involuntary_channel: [
-        { required: true, message: "请输入非自愿退票渠道", trigger: "blur" }
-      ],
-      validate_time: [
-        { required: true, message: "请选择有效期", trigger: "blur" }
-      ],
-      voluntary_channel: [
-        { required: true, message: "请输入自愿退票渠道", trigger: "blur" }
-      ],
-    },
-    warningDialog: false, // 警告弹窗
+      configForm: {}, // 表单数据
+      rules: {
+        // 表单 验证
+        air_company: [
+          {required: true, message: "请输入航司名称", trigger: "blur"}
+        ],
+        air_company_code: [{required: true, message: "请输入航司二字码", trigger: "blur"}],
+        involuntary_channel: [
+          {required: true, message: "请输入非自愿退票渠道", trigger: "blur"}
+        ],
+        validate_time: [
+          {required: true, message: "请选择有效期", trigger: "blur"}
+        ],
+        voluntary_channel: [
+          {required: true, message: "请输入自愿退票渠道", trigger: "blur"}
+        ],
+      },
+      warningDialog: false, // 警告弹窗
 
-    checkedStatus: {}, //  是否启用配置文件数据
+      checkedStatus: {}, //  是否启用配置文件数据
 
-  }),
-  methods: {
-    /**
-     * @description: 获取航司配置
-     * @param {type}
-     * @return:
-     */
+    }),
+    methods: {
+      /**
+       * @description: 获取航司配置
+       * @param {type}
+       * @return:
+       */
 
-    getDataList() {
-      this.configList = []
-      this.$axios.get("/config/configFile").then(res => {
-        if (res.data.code === 0) {
-          let configData = res.data.data
-          let trueNuc = []
-          let falseNuc = []
-          configData.forEach((item,index) =>{
-            item.is_using = item.is_using === 'yes'
-            if(item.is_nuc){
-              item['nuc_type'] = 'nuc-' + index
-              trueNuc.push(item)
-            }else {
-              item['nuc_type'] = 'notNuc-' + index
-              falseNuc.push(item)
-            }
-          })
-          this.configList.push({
-            nuc_type: 'NUC文件',
-            type: 'menu',
-            children: trueNuc
-          },{
-            nuc_type: '不为NUC文件',
-            type: 'menu',
-            children: falseNuc
-          })
+      getDataList() {
+        this.configList = []
+        this.$axios.get("/config/configFile").then(res => {
+          if (res.data.code === 0) {
+            let configData = res.data.data
+            let trueNuc = []
+            let falseNuc = []
+            configData.forEach((item, index) => {
+              item.is_using = item.is_using === 'yes'
+              if (item.is_nuc) {
+                item['nuc_type'] = 'nuc-' + index
+                trueNuc.push(item)
+              } else {
+                item['nuc_type'] = 'notNuc-' + index
+                falseNuc.push(item)
+              }
+            })
+            this.configList.push({
+              nuc_type: 'NUC文件',
+              type: 'menu',
+              children: trueNuc
+            }, {
+              nuc_type: '非NUC文件',
+              type: 'menu',
+              children: falseNuc
+            })
 
-          console.log(this.configList);
+            console.log(this.configList);
 
 
+          } else {
+            this.$message.warning(res.data.message);
+          }
+        });
+      },
+
+      /**
+       * @description: 新增\编辑弹窗
+       * @param {type}
+       * @return:
+       */
+      openConfigDialog(type, data) {
+        this.dialogTitleType = type;
+
+        if (type === "edit") {
+          this.configForm = JSON.parse(JSON.stringify(data));
+          console.log(this.configForm);
+          // if (this.configForm.takeoff_time) {
+          //   this.configForm.takeoff_time = this.configForm.takeoff_time.split(
+          //     "|"
+          //   );
+          // }
+          // if (this.configForm.ticket_time) {
+          //   this.configForm.ticket_time = this.configForm.ticket_time.split("|");
+          // }
+          // if (this.configForm.validate_time) {
+          //   this.configForm.validate_time = this.configForm.validate_time.split(
+          //     "|"
+          //   );
+          // }
         } else {
-          this.$message.warning(res.data.message);
+          this.configForm = {};
         }
-      });
-    },
 
-    /**
-     * @description: 新增\编辑弹窗
-     * @param {type}
-     * @return:
-     */
-    openConfigDialog(type, data) {
-      this.dialogTitleType = type;
+        console.log(type, data);
+        this.configDialog = true;
+      },
 
-      if (type === "edit") {
-        this.configForm = JSON.parse(JSON.stringify(data));
-        console.log(this.configForm);
-        // if (this.configForm.takeoff_time) {
-        //   this.configForm.takeoff_time = this.configForm.takeoff_time.split(
-        //     "|"
-        //   );
-        // }
-        // if (this.configForm.ticket_time) {
-        //   this.configForm.ticket_time = this.configForm.ticket_time.split("|");
-        // }
-        // if (this.configForm.validate_time) {
-        //   this.configForm.validate_time = this.configForm.validate_time.split(
-        //     "|"
-        //   );
-        // }
-      } else {
-        this.configForm = {};
-      }
-
-      console.log(type, data);
-      this.configDialog = true;
-    },
-
-    /**
-     * @description: 删除配置
-     * @param {type}
-     * @return:
-     */
-    editCinfig(val) {
-      console.log(val);
-      this.$axios.delete('/config/configFile/'+val.air_company)
-        .then(res =>{
-          this.$message(res.data.message)
-        if(res.data.code === 0){
-          this.getDataList()
-        }
+      /**
+       * @description: 删除配置
+       * @param {type}
+       * @return:
+       */
+      editCinfig(val) {
+        console.log(val);
+        this.$confirm(" 该操作将删除此配置文件， 请慎重删除！", "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "error"
         })
-    },
+          .then(() => {
+            this.$axios.delete('/config/configFile/' + val.air_company)
+              .then(res => {
+                this.$message(res.data.message)
+                if (res.data.code === 0) {
+                  this.getDataList()
+                }
+              })
+          })
+          .catch(() => {});
 
-    /**
-     * @description: 表单提交按钮
-     * @param {type}
-     * @return:
-     */
+      },
 
-    submitBtn() {
-      let formData = JSON.parse(JSON.stringify(this.configForm));
+      /**
+       * @description: 表单提交按钮
+       * @param {type}
+       * @return:
+       */
 
-      formData.takeoff_time =
-        formData.takeoff_time.length > 0
-          ? String(formData.takeoff_time).replace(",", "|")
-          : ""; // 起飞时间段
-      formData.ticket_time =
-        formData.ticket_time.length > 0
-          ? String(formData.ticket_time).replace(",", "|")
-          : ""; // 出票起始时间段
-      formData.validate_time =
-        formData.validate_time.length > 0
-          ? String(formData.validate_time).replace(",", "|")
-          : ""; // 有效期
+      submitBtn() {
+        let formData = JSON.parse(JSON.stringify(this.configForm));
+        console.log(formData);
+        formData['code_for_free'] = (formData['code_for_free_en'] ? formData['code_for_free_en'] : '') + '-' + (formData['code_for_free_number'] ? formData['code_for_free_number'] : '')
+        delete formData['code_for_free_en']
+        delete formData['code_for_free_number']
+        // if(formData.takeoff_time || formData.takeoff_time.length > 0){
+        //   formData.takeoff_time = String(formData.takeoff_time).replace(",", "|")
+        // }
+        // if(formData.takeoff_time || formData.ticket_time.length > 0){
+        //   formData.ticket_time = String(formData.ticket_time).replace(",", "|")
+        // }
+        // if(formData.takeoff_time || formData.validate_time.length > 0){
+        //   formData.validate_time = String(formData.validate_time).replace(",", "|")
+        // }
 
-      console.log(formData);
+        formData.is_using = formData.is_using ? 'yes' : 'no' // 是否可用
 
-      this.$axios.post("/config/configFile", formData).then(res => {
-        this.$message(res.data.message)
-        if(res.data.code === 0){
-          this.configDialog = false;
+        console.log(formData);
+
+        this.$axios.post("/config/configFile", formData).then(res => {
+
+          if (res.data.code === 0) {
+            this.configDialog = false;
+            this.$message.success(res.data.message)
+            this.getDataList()
+          }else {
+            this.$message.warning(res.data.message)
+          }
+        });
+      },
+
+      /**
+       * @Description: 是否可用
+       * @author Wish
+       * @date 2020/6/11
+       */
+      checkedUsing(val, list) {
+        this.checkedStatus = {
+          configName: 'configFile',
+          isUsing: val ? 'yes' : 'no',
+          itemID: list.ID
+        }
+        if (!val) {
+          this.warningDialog = true
+        } else {
+          this.closeConfig(true)
+        }
+      },
+
+      /**
+       * @Description: 配置文件确认关闭
+       * @author Wish
+       * @date 2020/6/12
+       */
+      closeConfig(type) {
+        if (type) {
+          this.$axios.post('/config/use', this.checkedStatus)
+            .then(res => {
+              console.log(res);
+              if (res.data.code === 0) {
+                this.$message.success(res.data.message)
+              } else {
+                this.$message.warning(res.data.message)
+                this.getDataList()
+              }
+            })
+        } else {
           this.getDataList()
         }
-      });
+        this.warningDialog = false
+      },
     },
-
-    /**
-     * @Description: 是否可用
-     * @author Wish
-     * @date 2020/6/11
-    */
-    checkedUsing(val,list){
-      this.checkedStatus  = {
-        configName: 'configFile',
-        isUsing: val? 'yes': 'no',
-        itemID: list.ID
-      }
-      if(!val){
-        this.warningDialog = true
-      }else {
-        this.closeConfig(true)
-      }
-
-    },
-
-    /**
-     * @Description: 配置文件确认关闭
-     * @author Wish
-     * @date 2020/6/12
-    */
-    closeConfig(type){
-      if(type){
-        this.$axios.post('/config/use',this.checkedStatus)
-          .then(res =>{
-            console.log(res);
-            if(res.data.code === 0){
-              this.$message.success(res.data.message)
-            }else {
-              this.$message.warning(res.data.message)
-              this.getDataList()
-            }
-          })
-      }else {
-        this.getDataList()
-      }
-      this.warningDialog = false
-    },
-  },
-};
+  };
 </script>
 
 <style lang="less" scoped>
-.config_file {
-  position: relative;
-  .config_add_btn {
-    position: absolute;
-    right: 0;
-    top: -50px;
-  }
+  .config_file {
+    position: relative;
 
-  .config_dialog {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /deep/.el-dialog {
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 50px !important;
+    .config_add_btn {
+      position: absolute;
+      right: 0;
+      top: -50px;
+    }
 
-      .el-dialog__body {
-        padding-bottom: unset;
-        overflow: auto;
+    .config_dialog {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      /deep/ .el-dialog {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 50px !important;
+
+        .el-dialog__body {
+          padding-bottom: unset;
+          overflow: auto;
+        }
+      }
+
+      /deep/ .el-date-editor {
+        width: 100%;
       }
     }
-    /deep/.el-date-editor {
-      width: 100%;
-    }
   }
-}
 </style>
