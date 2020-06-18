@@ -5,6 +5,61 @@
         <i class="el-icon-arrow-left"></i>返回
       </div>
     </div>
+
+<!--    订单信息 - 记录 -  黑屏信息  -->
+
+    <div class="basic_info">
+      <div class="info_title">基本信息</div>
+      <div class="info_content">
+        <div class="info_content_list">
+          <p class="title">PNR</p>
+          <p class="content">{{detailsData.Pnr.PnrCode || ''}}</p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">退废状态</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">销售店铺/单号</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">销售方退废单号/单号</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">乘机人</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">申请人</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">复核者</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">所属部门</p>
+          <p class="content"></p>
+        </div>
+
+        <div class="info_content_list">
+          <p class="title">退废来源</p>
+          <p class="content"></p>
+        </div>
+
+
+      </div>
+    </div>
+
     <div class="setting_content">
       <el-table
         v-if="isTableAlive"
@@ -19,6 +74,7 @@
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           prop="date"
           label="采购渠道"
           width="180">
@@ -27,17 +83,20 @@
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           prop="Name"
           label="乘机人"
           width="180">
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           label="票号">
           <template slot-scope="scope">
             {{$getTicketNumber(scope.row.PassengerVoyages)}}
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           width="220"
           label="航程信息">
           <template slot-scope="scope">
@@ -47,16 +106,19 @@
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           label="票价">
           <template slot-scope="scope">
             票面价：{{tableDetr[scope.$index].CostInfo.Price + '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
+          width="200"
           label="税金">
           <template slot-scope="scope">
             <div class="taxs_main" @click="openEditTaxs(scope.$index,tableDetr[scope.$index].Taxs)">
-              <div>应退税金：{{$Tax(tableDetr[scope.$index].Taxs) + '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}</div>
+              <div>应退总税金：{{$Tax(tableDetr[scope.$index].Taxs) + '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}</div>
               <p>税金明细：</p>
               <div class="taxs_box" v-for="(item, index) in Object.keys(tableDetr[scope.$index].Taxs)" :key="index">
                 {{item}}：{{tableDetr[scope.$index].Taxs[item]}}
@@ -65,12 +127,14 @@
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           label="其他费用">
           <template slot-scope="scope">
             <div>已使用票价：{{tableDetr[scope.$index].UsedFare}}</div>
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           label="代理费">
           <template slot-scope="scope">
             {{tableDetr[scope.$index].CostInfo.Price +
@@ -80,6 +144,7 @@
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           label="应退金额">
           <template slot-scope="scope">
             {{(Number(tableDetr[scope.$index].CostInfo.Price) +
@@ -89,6 +154,7 @@
           </template>
         </ex-table-column>
         <ex-table-column
+          :autoFit="true"
           label="实退金额">
         </ex-table-column>
       </el-table>
@@ -301,9 +367,6 @@
       },
 
 
-
-
-
       /**
        * @Description: 再次提交
        * @author Wish
@@ -327,9 +390,6 @@
               this.$message.warning(res.data.message)
             }
           })
-
-
-
       },
 
       /**
@@ -375,6 +435,51 @@
         }
       }
     }
+
+    .basic_info{
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      .info_title{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 60px;
+        width: 80px;
+        background: #f2f2f2;
+        margin-right: 15px;
+        font-size: 14px;
+      }
+      .info_content{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        height: 100%;
+        background: #f2f2f2;
+        padding: 0 10px;
+        .info_content_list{
+          display: inline-flex;
+          align-items: center;
+          height: 100%;
+          &:not(:last-child){
+            margin-right: 15px;
+          }
+          .title{
+            font-weight: 400;
+            &::after{
+              content: '：'
+            }
+          }
+          .content{
+
+          }
+        }
+      }
+    }
+
+
+
+
     .setting_content{
       padding: 20px;
       .details_header{

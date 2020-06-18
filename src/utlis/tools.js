@@ -102,3 +102,5 @@ Vue.prototype.$TimeSetting = (time,format) => {
 };
 
 
+// Vue.prototype.
+

@@ -17,7 +17,7 @@
       <!--        -->
       <!--      </el-table-column>-->
       <el-table-column prop="air_company" label="航司名称">
-        <template scope="scope">
+        <template v-slot="scope">
           <span v-if="scope.row.type">
             {{scope.row.nuc_type}}
           </span>
@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column prop="air_company_code" label="航司二字码"></el-table-column>
       <el-table-column label="是否可用" width="80" align="center">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <el-switch
             v-if="!scope.row.type"
             v-model="scope.row.is_using"
@@ -47,38 +47,38 @@
       <el-table-column prop="voluntary_channel" width="80" align="center" label="自愿退票渠道"></el-table-column>
       <el-table-column prop="involuntary_channel" label="非自愿退票渠道" width="80" align="center"></el-table-column>
       <el-table-column label="结算码" width="65" align="center">
-        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.IsSpecFile? '是': '否'}}</span></template>
+        <template v-slot="scope"><span v-if="!scope.row.type">{{scope.row.IsSpecFile? '是': '否'}}</span></template>
       </el-table-column>
       <el-table-column label="适用全航司">
-        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_all_air_company? '适用': '不适用'}}</span>
+        <template v-slot="scope"><span v-if="!scope.row.type">{{scope.row.is_all_air_company? '适用': '不适用'}}</span>
         </template>
       </el-table-column>
       <el-table-column label="noShow票">
-        <template slot-scope="scope"><span v-if="!scope.row.type">{{scope.row.is_no_show? '是': '否'}}</span></template>
+        <template v-slot="scope"><span v-if="!scope.row.type">{{scope.row.is_no_show? '是': '否'}}</span></template>
       </el-table-column>
       <el-table-column prop="publish_time" label="发布日期">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span v-if="!scope.row.type">{{$TimeSetting(scope.row.publish_time)}}</span>
         </template>
       </el-table-column>
       <el-table-column prop="takeoff_time" label="起飞时间段">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span v-if="!scope.row.type">{{$TimeSetting(scope.row.publish_time)}}</span>
         </template>
       </el-table-column>
       <el-table-column prop="ticket_time" label="出票起始时间段">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span v-if="!scope.row.type">{{$TimeSetting(scope.row.ticket_time)}}</span>
         </template>
       </el-table-column>
       <el-table-column prop="validate_time" label="有效期">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <span v-if="!scope.row.type">{{$TimeSetting(scope.row.validate_time)}}</span>
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="操作" width="80" fixed="right">
-        <template slot-scope="scope">
+        <template v-slot="scope">
           <div style="display: flex;" v-if="!scope.row.type">
             <!--            <el-button size="mini" @click="openConfigDialog('edit',scope.row)">编辑</el-button>-->
             <el-button size="mini" @click="editCinfig(scope.row)">删除</el-button>
