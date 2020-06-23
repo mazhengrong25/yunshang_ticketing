@@ -185,14 +185,14 @@
         ></ex-table-column>
 
         <ex-table-column
-          :autoFit="true"
           align="center"
+          width="120"
           show-overflow-tooltip
           prop="RefundChannel"
           label="退票渠道"
         ></ex-table-column>
 
-        <ex-table-column :autoFit="true" align="center" show-overflow-tooltip label="PNR">
+        <ex-table-column  width="120" align="center" show-overflow-tooltip label="PNR">
           <template slot-scope="scope">
             <div class="jumpDetalis" @click="jumpDetails(scope.row)">
               <el-link v-if="scope.row.PNRChanged" class="pnrText" type="primary">{{scope.row.PNRChanged}}</el-link>
@@ -215,6 +215,21 @@
           <template v-slot="scope">
             <p v-for="(item, index) in scope.row.PlatformOrderNo" :key="index">{{item}}</p>
           </template>
+        </ex-table-column>
+
+        <ex-table-column
+          align="center"
+          width="200"
+          :autoFit="true"
+          show-overflow-tooltip
+          prop="RefundMsg"
+          label="退票信息">
+<!--          <template slot-scope="scope">-->
+<!--            <div class="table_hidden_txt">-->
+<!--              <span></span>-->
+<!--              <p>{{scope.row.RefundMsg}}</p>-->
+<!--            </div>-->
+<!--          </template>-->
         </ex-table-column>
 
         <ex-table-column
@@ -278,7 +293,7 @@
           <template slot-scope="scope">
             <div class="table_hidden_txt">
               <span></span>
-              <p>{{$getTime(scope.row.SubmitTime)}}</p>
+              <p>{{$getTime(scope.row.UpdateTime)}}</p>
             </div>
           </template>
         </ex-table-column>
@@ -412,32 +427,42 @@
       title="更新退票状态"
       :modal-append-to-body="false"
       :visible.sync="updateSettingDialog"
-      width="600px"
+      width="800px"
     >
       <div class="update_setting_main">
-        <el-form ref="form" label-width="140px">
-          <el-form-item label="退票票号">
-            <el-input v-model="updateSetting.ticketNo"></el-input>
+        <el-form ref="form" label-width="80px" v-for="(item, index) in updateSettingData.TicketNos" :key="index">
+          <el-form-item label="退票单号">
+            {{item}}
           </el-form-item>
-          <el-form-item label="备注信息">
-            <el-input v-model="updateSetting.remark"></el-input>
+          <el-form-item label="退票票号">
+            <el-input clearable v-model="updateSetting[index].ticketNo"></el-input>
           </el-form-item>
           <el-form-item label="退票状态">
-            <el-select style="width: 100%" v-model="updateSetting.status" placeholder="请选择退票状态">
+            <el-select style="width: 100%" clearable v-model="updateSetting[index].status" placeholder="请选择退票状态">
               <el-option label="退票成功" value="0"></el-option>
               <el-option label="退票失败" value="1"></el-option>
               <el-option label="渠道不支持" value="2"></el-option>
               <el-option label="已拒单" value="4"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="退票详情">
-            <el-input v-model="updateSetting.message"></el-input>
+          <el-form-item label="退票信息">
+            <el-input clearable v-model="updateSetting[index].message"></el-input>
+          </el-form-item>
+          <el-form-item label="备注信息">
+            <el-input clearable v-model="updateSetting[index].remark"></el-input>
           </el-form-item>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="updateSettingDialog = false">关 闭</el-button>
-        <el-button type="primary" @click="submitUpdate">确 定</el-button>
+        <el-form label-width="80px" class="">
+          <el-form-item label="提交者">
+            <el-input placeholder="请输入提交者" v-model="updateSettingUser" clearable class="update_setting_user"></el-input>
+          </el-form-item>
+        </el-form>
+        <div class="footer_btn_box">
+          <el-button @click="updateSettingDialog = false">关 闭</el-button>
+          <el-button type="primary" @click="submitUpdate">确 定</el-button>
+        </div>
       </div>
     </el-dialog>
 
@@ -547,7 +572,8 @@
         // pageSize:10
 
         updateSettingDialog: false, // 更新退票状态
-        updateSetting: {}, // 更新状态数据
+        updateSetting: [], // 更新状态数据
+        updateSettingUser: '', // 执行者
         updateSettingData: {},
 
         updateAgainSettingDialog: false, // 再次提交弹窗
@@ -629,11 +655,26 @@
                 let statusList = []
                 this.dataList.forEach((item, index) => {
                   let numberID = []
-                  item.PlatformOrderNo.split(';').forEach(no => {
-                    numberID.push(no.split(':')[1])
-                  })
-                  item.PlatformOrderNo = numberID;
+
+                    try {
+                      item.PlatformOrderNo.split(';').forEach(no => {
+                        numberID.push(no.split(':')[1])
+                        item.PlatformOrderNo = numberID;
+                      })
+                      try {
+                        item.RefundMsg = (item.RefundMsg.split('@@').pop()).split('^').pop()
+                      }catch (e) {
+                        try {
+                          item.RefundMsg = item.RefundMsg.split('@@').pop()
+                        }catch (e) {
+                        }
+                      }
+                    }catch (e) {
+                      console.log(e);
+                    }
+
                   statusList.push(item.RefundStatus)
+
                 })
                 //'未提交':0,'已提交':0,'退票失败':0,'退票成功':0,'已拒单':0,'线下退':0,'待确认':0,'取消复核':0,'销账':0
                 let statusObj = statusList.reduce((allNames, name) => {
@@ -765,12 +806,34 @@
        * @param {type}
        * @return:
        */
-
       updateBtn(data) {
         console.log(data);
-        this.updateSetting = {}
+        this.updateSetting = []
+        this.updateSettingUser = ''
         this.updateSettingData = {}
-        this.updateSettingData = data
+        let newData = JSON.parse(JSON.stringify(data))
+        newData.TicketNos = []
+        try {
+          data.TicketNos.split(';').forEach(item =>{
+            newData.TicketNos.push(item.split(',').shift())
+          })
+        }catch (e) {
+          try {
+            newData.TicketNos = data.TicketNos.split(',').shift()
+          }catch (e) {
+
+          }
+        }
+        newData.TicketNos.forEach((item, index) =>{
+          this.updateSetting.push({
+            ticketNo: '',
+            remark: '',
+            status: '',
+            message: ''
+          })
+        })
+        console.log(newData);
+        this.updateSettingData = newData
         this.updateSettingDialog = true
       },
 
@@ -829,20 +892,30 @@
         console.log(this.updateSetting);
         console.log(JSON.parse(this.updateSettingData.OriginalData).BuyOrders);
         let beyOrder = JSON.parse(this.updateSettingData.OriginalData).BuyOrders
+        let statusType = this.updateSetting.findIndex(item => {
+          return item.status !== '0';
+        });
+        let newUpdateSetting = JSON.parse(JSON.stringify(this.updateSetting))
+        newUpdateSetting.forEach(item =>{
+          item.status = Number(item.status)
+        })
+        console.log(statusType);
         let data = {
-          BuyOrders: beyOrder || {},
-          refundBuyPassenger: {
+          executorName: '前端提交-'+this.updateSettingUser,
+          refundBuyPassenger: [{
             buyOrderId: beyOrder[0].Id,
             passengerId: beyOrder[0].Passengers[0].Id,
-            tickNoAction: this.updateSetting
-          },
-        }
+            tickNoAction: newUpdateSetting
+          }],
+          status: statusType === -1? 0: 1
+        }f
         this.$axios.post('/refund/update', data)
           .then(res => {
             console.log(res);
             if (res.data.code === 0) {
               this.updateSettingDialog = false
               this.$message.success(res.data.message)
+              this.getData()
             } else {
               this.$message.warning(res.data.message)
             }
@@ -1028,7 +1101,7 @@
         min-height: 400px;
 
         .el-table__body-wrapper {
-          height: 100% !important;
+          /*height: 100% !important;*/
         }
       }
 
@@ -1115,9 +1188,34 @@
     }
   }
 
-  /deep/ .update_setting {
+  /deep/.update_setting {
     .el-dialog__body {
       padding-bottom: unset;
     }
+    .update_setting_main{
+      display: flex;
+      align-items: flex-start;
+      overflow-x: auto;
+      .el-form{
+        flex: 1;
+        min-width: 350px;
+        &:not(:last-child){
+          border-right: 1px dashed #dedede;
+          padding-right: 10px;
+        }
+      }
+    }
+    .dialog-footer{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .update_setting_user{
+        width: 200px;
+      }
+      .footer_btn_box{
+        display: flex;
+      }
+    }
   }
+
 </style>

@@ -7,58 +7,87 @@
     </div>
 
 <!--    订单信息 - 记录 -  黑屏信息  -->
-
+    <!--  基本信息  -->
     <div class="basic_info">
-      <div class="info_title">基本信息</div>
       <div class="info_content">
+        <div class="info_content_list">
+          <p class="title notAfter">基本信息</p>
+        </div>
         <div class="info_content_list">
           <p class="title">PNR</p>
           <p class="content">{{detailsData.Pnr.PnrCode || ''}}</p>
         </div>
 
         <div class="info_content_list">
-          <p class="title">退废状态</p>
-          <p class="content"></p>
+          <p class="title">YATPID</p>
+          <p class="content">{{detailsData.Id || ''}}</p>
         </div>
 
         <div class="info_content_list">
-          <p class="title">销售店铺/单号</p>
-          <p class="content"></p>
-        </div>
-
-        <div class="info_content_list">
-          <p class="title">销售方退废单号/单号</p>
-          <p class="content"></p>
-        </div>
-
-        <div class="info_content_list">
-          <p class="title">乘机人</p>
-          <p class="content"></p>
-        </div>
-
-        <div class="info_content_list">
-          <p class="title">申请人</p>
-          <p class="content"></p>
-        </div>
-
-        <div class="info_content_list">
-          <p class="title">复核者</p>
-          <p class="content"></p>
+          <p class="title">BuyOrderID</p>
+          <p class="content">{{detailsData.BuyOrders[0].Id || ''}}</p>
         </div>
 
         <div class="info_content_list">
           <p class="title">所属部门</p>
-          <p class="content"></p>
+          <p class="content">{{detailsData.CreateDepartment || ''}}</p>
         </div>
 
         <div class="info_content_list">
-          <p class="title">退废来源</p>
-          <p class="content"></p>
+          <p class="title">复核者</p>
+          <p class="content">{{detailsData.AuditorName}}</p>
         </div>
+
+        <div class="info_content_list">
+          <p class="title">申请人</p>
+          <p class="content">{{detailsData.CreatorName}}</p>
+        </div>
+      </div>
+      <div class="arr_content">
+        <div class="info_content_list">
+          <p class="title notAfter">航程信息</p>
+        </div>
+        <div class="info_air_box">
+          <div class="info_air" v-for="(item ,index) in voyageList" :key="index">
+            <div class="info_content_list">
+              <p class="title">航空公司</p>
+              <p class="content">{{item.Airline || ''}}</p>
+            </div>
+            <div class="info_content_list">
+              <p class="title">起飞机场</p>
+              <p class="content">{{item.DepAirport || ''}}</p>
+            </div>
+            <div class="info_content_list">
+              <p class="title">起飞时间</p>
+              <p class="content">{{item.DepTime || ''}}</p>
+            </div>
+            <div class="info_content_list">
+              <p class="title">航班号</p>
+              <p class="content">{{item.FlightNo || ''}}</p>
+            </div>
+            <div class="info_content_list">
+              <p class="title">舱位</p>
+              <p class="content">{{item.Cabin || ''}}</p>
+            </div>
+            <div class="info_content_list">
+              <p class="title">到达机场</p>
+              <p class="content">{{item.ArrAirport || ''}}</p>
+            </div>
+            <div class="info_content_list">
+              <p class="title">到达时间</p>
+              <p class="content">{{item.ArrTime || ''}}</p>
+            </div>
+          </div>
+        </div>
+
 
 
       </div>
     </div>
+
+
+
+
 
     <div class="setting_content">
       <el-table
@@ -109,7 +138,7 @@
           :autoFit="true"
           label="票价">
           <template slot-scope="scope">
-            票面价：{{tableDetr[scope.$index].CostInfo.Price + '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
+            票面价：{{(tableDetr[scope.$index].CostInfo.Price || 0) + '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
           </template>
         </ex-table-column>
         <ex-table-column
@@ -137,9 +166,9 @@
           :autoFit="true"
           label="代理费">
           <template slot-scope="scope">
-            {{tableDetr[scope.$index].CostInfo.Price +
+            {{(tableDetr[scope.$index].CostInfo.Price || 0) +
             '（票面价）* '+ tableDetr[scope.$index].CostInfo.AgencyFee +
-            '（代理费率）= ' + (Number(tableDetr[scope.$index].CostInfo.Price) * Number(tableDetr[scope.$index].CostInfo.AgencyFee)) +
+            '（代理费率）= ' + (Number(tableDetr[scope.$index].CostInfo.Price || 0) * Number(tableDetr[scope.$index].CostInfo.AgencyFee)) +
             '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
           </template>
         </ex-table-column>
@@ -147,7 +176,7 @@
           :autoFit="true"
           label="应退金额">
           <template slot-scope="scope">
-            {{(Number(tableDetr[scope.$index].CostInfo.Price) +
+            {{((Number(tableDetr[scope.$index].CostInfo.Price) || 0) +
             Number($Tax(tableDetr[scope.$index].Taxs)) -
             Number(tableDetr[scope.$index].UsedFare)) +
             '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
@@ -240,14 +269,17 @@
         taxsEditData: [], // 当前修改税金弹窗 税金数据
 
         editDetailsData: {}, // 当前修改详情数据
+
+        voyageList: [], // 航班信息列表
       }
     },
     methods: {
       getDetailsData(){
         let data = {
           id: Number(this.detailsStatus.id),
-          start_time: this.detailsStatus.time
+          // start_time: this.detailsStatus.time
         }
+        let VoyageIdList = []  // 航班信息Id
         this.$axios.post('/refund/query',data)
           .then(res =>{
             let details = res.data.data[0]
@@ -255,17 +287,50 @@
             console.log(this.detailsData);
             this.tableData = this.detailsData.BuyOrders[0].Passengers
             this.tableData.forEach(item => {item.RefundCenterDETR = JSON.parse(item.RefundCenterDETR)})
+            this.tableData.forEach(item =>{
+              item.PassengerVoyages.forEach(oitem =>{
+                VoyageIdList.push(oitem.VoyageId)
+              })
+            })
             console.log(this.tableData);
 
+            this.detailsData.Voyages.forEach(item =>{
+              VoyageIdList.forEach(vitem =>{
+                if(item.Id === vitem){
+                  this.voyageList.push(item)
+                }
+              })
+              this.voyageList = [...new Set(this.voyageList)]
+            })
             this.detailsData.BuyOrders[0].Passengers.forEach(item =>{
-              console.log();
               if(item.RefundCenterDETR.webInput){
                 this.tableDetr.push(JSON.parse(item.RefundCenterDETR.webInput))
-              }else {
+              }else if(item.RefundCenterDETR.blackScreen){
                 this.tableDetr.push(JSON.parse(item.RefundCenterDETR.blackScreen))
+              }else {
+                this.tableDetr.push(item.RefundCenterDETR)
+              }
+            })
+            this.tableDetr.forEach(item =>{
+              console.log(item.CostInfo);
+              if(item.CostInfo === null){
+                item.CostInfo = {
+                  Price : 0,
+                  Currency : '',
+                  AgencyFee : 0
+                }
               }
 
+              // item.CostInfo = {
+              //   Price: item.CostInfo.Price?item.CostInfo.Price: 0,
+              //   AgencyFee: item.CostInfo.AgencyFee?item.CostInfo.AgencyFee: 0,
+              //   Currency: item.CostInfo.Currency?item.CostInfo.Currency: ''
+              // }
+              console.log(item.CostInfo);
+
             })
+            console.log(this.tableDetr);
+
 
           })
       },
@@ -437,44 +502,58 @@
     }
 
     .basic_info{
-      display: flex;
-      align-items: center;
       padding: 0 20px;
-      .info_title{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 60px;
-        width: 80px;
-        background: #f2f2f2;
-        margin-right: 15px;
-        font-size: 14px;
-      }
+      margin-top: 10px;
       .info_content{
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        height: 100%;
-        background: #f2f2f2;
-        padding: 0 10px;
+        height: 50px;
         .info_content_list{
-          display: inline-flex;
-          align-items: center;
-          height: 100%;
-          &:not(:last-child){
-            margin-right: 15px;
+          border: 1px solid #dedede;
+          margin-left: -1px;
+        }
+      }
+
+      .arr_content{
+        display: flex;
+        align-items: center;
+        border: 1px solid #dedede;
+        margin-top: 15px;
+
+        .info_air_box{
+          border-left: 1px solid #dedede;
+          width: 100%;
+          .info_air{
+            height: 50px;
+            display: flex;
+            align-items: center;
+            margin-bottom: -1px;
+            border-bottom: 1px solid #dedede;
           }
-          .title{
-            font-weight: 400;
+        }
+      }
+      .info_content_list{
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 15px;
+        flex-shrink: 0;
+
+        .title{
+          font-weight: 400;
+          &:not(.notAfter){
             &::after{
               content: '：'
             }
           }
-          .content{
 
-          }
+        }
+        .content{
+          font-size: 14px;
         }
       }
+
     }
 
 

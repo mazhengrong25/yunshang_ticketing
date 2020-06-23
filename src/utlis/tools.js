@@ -49,11 +49,16 @@ Vue.prototype.$getTicketNumber = (data) =>{
  * @date 2020/6/9
  */
 Vue.prototype.$Tax = (data) =>{
-  let tax = 0
-  Object.keys(data).forEach(item =>{
-    tax += data[item]
-  })
-  return tax
+  if(data){
+    let tax = 0
+    Object.keys(data).forEach(item =>{
+      tax += data[item]
+    })
+    return tax
+  }else {
+    return data
+  }
+
 }
 
 
