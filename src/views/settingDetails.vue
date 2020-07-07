@@ -167,18 +167,21 @@
           label="代理费">
           <template slot-scope="scope">
             {{(tableDetr[scope.$index].CostInfo.Price || 0) +
-            '（票面价）* '+ tableDetr[scope.$index].CostInfo.AgencyFee +
-            '（代理费率）= ' + (Number(tableDetr[scope.$index].CostInfo.Price || 0) * Number(tableDetr[scope.$index].CostInfo.AgencyFee)) +
+            '（票面价）* '+ $Agency(tableDetr[scope.$index].CostInfo.AgencyFee) +
+            '（代理费率）= ' + (Number(tableDetr[scope.$index].CostInfo.Price || 0) * $Agency(tableDetr[scope.$index].CostInfo.AgencyFee)).toFixed(1) +
             '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
           </template>
         </ex-table-column>
+<!--        num.toFixed(2);-->
         <ex-table-column
           :autoFit="true"
           label="应退金额">
           <template slot-scope="scope">
             {{((Number(tableDetr[scope.$index].CostInfo.Price) || 0) +
             Number($Tax(tableDetr[scope.$index].Taxs)) -
-            Number(tableDetr[scope.$index].UsedFare)) +
+            Number(tableDetr[scope.$index].UsedFare) -
+            (Number(tableDetr[scope.$index].CostInfo.Price || 0) * $Agency(tableDetr[scope.$index].CostInfo.AgencyFee))).toFixed(1) +
+
             '（'+tableDetr[scope.$index].CostInfo.Currency+'）'}}
           </template>
         </ex-table-column>

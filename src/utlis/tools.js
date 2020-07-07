@@ -44,7 +44,7 @@ Vue.prototype.$getTicketNumber = (data) =>{
 
 
 /**
- * @Description: 税金计算   应退金额计算  票面价 + 应退税金  - 已使用票价 = 应退金额
+ * @Description: 税金计算   应退金额计算  票面价 + 应退税金  - 已使用票价 - 代理费 = 应退金额
  * @author Wish
  * @date 2020/6/9
  */
@@ -58,7 +58,15 @@ Vue.prototype.$Tax = (data) =>{
   }else {
     return data
   }
+}
 
+Vue.prototype.$Agency = (number) =>{
+  number = Number(number)
+  if(number >= 1){
+    return (number / 100)
+  }else {
+    return number
+  }
 }
 
 

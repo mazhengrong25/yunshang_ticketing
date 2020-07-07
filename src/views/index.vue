@@ -605,7 +605,7 @@
       load() {
         if (this.loadStatus && this.statusCheck === '全部') {
           this.searchData.offset =
-            this.searchData.offset + this.searchData.limit + 1;
+            this.searchData.offset + this.searchData.limit;
           this.getData();
         }
       },
@@ -637,7 +637,6 @@
          * @author Wish
          * @date 2020/3/13
          */
-        this.dataList = []
         if (this.orderTime) {
           this.searchData["start_time"] = new Date(
             this.orderTime[0]
@@ -944,6 +943,8 @@
             if (res.data.code === 0) {
               this.updateSettingDialog = false
               this.$message.success(res.data.message)
+              this.dataList = []
+
               this.getData()
             } else {
               this.$message.warning(res.data.message)
