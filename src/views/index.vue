@@ -130,7 +130,7 @@
         height="calc(100vh - 250px)"
         border
         size="small"
-        @current-change="handleSelect"
+        @row-click="handleSelect"
         style="width: 100%;"
         @selection-change="handleSelectionChange"
       >
@@ -239,6 +239,9 @@
           show-overflow-tooltip
           prop="TicketNos"
           label="票号">
+          <template v-slot="scope">
+            <div v-for="(item ,index) in scope.row.TicketNos" :key="index">{{item}}</div>
+          </template>
         </ex-table-column>
 
         <!--        <ex-table-column-->
@@ -426,16 +429,17 @@
       custom-class="update_setting"
       title="更新退票状态"
       :modal-append-to-body="false"
+      :close-on-click-modal="false"
       :visible.sync="updateSettingDialog"
       width="800px"
     >
       <div class="update_setting_main">
         <el-form ref="form" label-width="80px" v-for="(item, index) in updateSettingData.TicketNos" :key="index">
-          <el-form-item label="退票单号">
+          <el-form-item label="退票票号">
             {{item}}
           </el-form-item>
-          <el-form-item label="退票票号">
-            <el-input clearable v-model="updateSetting[index].ticketNo"></el-input>
+          <el-form-item label="退票单号">
+            <el-input clearable v-model="updateSetting[index].platformRefundId"></el-input>
           </el-form-item>
           <el-form-item label="退票状态">
             <el-select style="width: 100%" clearable v-model="updateSetting[index].status" placeholder="请选择退票状态">
@@ -461,7 +465,7 @@
         </el-form>
         <div class="footer_btn_box">
           <el-button @click="updateSettingDialog = false">关 闭</el-button>
-          <el-button type="primary" @click="submitUpdate">确 定</el-button>
+          <el-button type="primary" @click="submitUpdate()">确 定</el-button>
         </div>
       </div>
     </el-dialog>
@@ -575,6 +579,7 @@
         updateSetting: [], // 更新状态数据
         updateSettingUser: '', // 执行者
         updateSettingData: {},
+        newSettingData: {},
 
         updateAgainSettingDialog: false, // 再次提交弹窗
 
@@ -598,7 +603,7 @@
       },
 
       load() {
-        if (this.loadStatus) {
+        if (this.loadStatus && this.statusCheck === '全部') {
           this.searchData.offset =
             this.searchData.offset + this.searchData.limit + 1;
           this.getData();
@@ -632,6 +637,7 @@
          * @author Wish
          * @date 2020/3/13
          */
+        this.dataList = []
         if (this.orderTime) {
           this.searchData["start_time"] = new Date(
             this.orderTime[0]
@@ -655,13 +661,25 @@
                 let statusList = []
                 this.dataList.forEach((item, index) => {
                   let numberID = []
-
+                  let ticketNo = []
+                  try {
+                    item.TicketNos.split(';').forEach(titem =>{
+                      ticketNo.push(titem.split(',').shift())
+                    })
+                    item.TicketNos = ticketNo
+                  }catch (e) {
                     try {
+                      item.TicketNos = item.TicketNos.split(',').shift()
+                    }catch (e) {
+
+                    }
+                  }
+                  try {
                       item.PlatformOrderNo.split(';').forEach(no => {
                         numberID.push(no.split(':')[1])
-                        item.PlatformOrderNo = numberID;
                       })
-                      try {
+                      item.PlatformOrderNo = numberID;
+                    try {
                         item.RefundMsg = (item.RefundMsg.split('@@').pop()).split('^').pop()
                       }catch (e) {
                         try {
@@ -670,9 +688,9 @@
                         }
                       }
                     }catch (e) {
-                      console.log(e);
-                    }
 
+                    }
+                  item.PlatformOrderNo = [...new Set(item.PlatformOrderNo)]
                   statusList.push(item.RefundStatus)
 
                 })
@@ -697,7 +715,6 @@
                   '销账': statusObj['销账'] || 0,
                 }
                 this.changeStatus()
-                console.log(this.dataList);
               } else {
                 this.loadStatus = false;
                 this.$message.warning("暂无更多数据");
@@ -789,6 +806,7 @@
        * @date 2020/3/16
        */
       handleSelect(val) {
+        console.log(val);
         this.channelName = val.RefundChannel;
       },
 
@@ -811,30 +829,38 @@
         this.updateSetting = []
         this.updateSettingUser = ''
         this.updateSettingData = {}
-        let newData = JSON.parse(JSON.stringify(data))
-        newData.TicketNos = []
-        try {
-          data.TicketNos.split(';').forEach(item =>{
-            newData.TicketNos.push(item.split(',').shift())
-          })
-        }catch (e) {
-          try {
-            newData.TicketNos = data.TicketNos.split(',').shift()
-          }catch (e) {
+        this.$axios.post('/refund/query',{id: data.ID})
+        .then(res =>{
+          if(res.data.code === 0){
+            let newData = JSON.parse(JSON.stringify(res.data.data[0]))
+            newData.TicketNos = []
 
+
+            try {
+              res.data.data[0].TicketNos.split(';').forEach(item =>{
+                newData.TicketNos.push(item.split(',').shift())
+              })
+            }catch (e) {
+              try {
+                newData.TicketNos = res.data.data[0].TicketNos.split(',').shift()
+              }catch (e) {
+
+              }
+            }
+            newData.TicketNos.forEach((item, index) =>{
+              this.updateSetting.push({
+                ticketNo: '',
+                remark: '',
+                status: '',
+                message: ''
+              })
+            })
+            this.updateSettingData = newData
+            this.updateSettingDialog = true
           }
-        }
-        newData.TicketNos.forEach((item, index) =>{
-          this.updateSetting.push({
-            ticketNo: '',
-            remark: '',
-            status: '',
-            message: ''
-          })
         })
-        console.log(newData);
-        this.updateSettingData = newData
-        this.updateSettingDialog = true
+
+
       },
 
       /**
@@ -872,14 +898,15 @@
        * @date 2020/6/12
        */
       changeStatus() {
-        this.dataList.forEach((item, index) => {
+        let newDataList = JSON.parse(JSON.stringify(this.dataList))
+        newDataList.forEach((item, index) => {
           if (this.statusCheck === '全部') {
             item.showStatus = true
           } else {
             item.showStatus = item.RefundStatus === this.statusCheck
           }
         })
-        this.reload()
+        this.dataList = newDataList
       },
 
 
@@ -889,26 +916,28 @@
        * @date 2020/6/13
        */
       submitUpdate() {
-        console.log(this.updateSetting);
-        console.log(JSON.parse(this.updateSettingData.OriginalData).BuyOrders);
+        console.log(this.updateSettingData);
         let beyOrder = JSON.parse(this.updateSettingData.OriginalData).BuyOrders
         let statusType = this.updateSetting.findIndex(item => {
           return item.status !== '0';
         });
         let newUpdateSetting = JSON.parse(JSON.stringify(this.updateSetting))
-        newUpdateSetting.forEach(item =>{
+        newUpdateSetting.forEach((item, index) =>{
+          item.ticketNo = this.updateSettingData.TicketNos[index]
           item.status = Number(item.status)
         })
-        console.log(statusType);
+        console.log(newUpdateSetting);
         let data = {
           executorName: '前端提交-'+this.updateSettingUser,
           refundBuyPassenger: [{
             buyOrderId: beyOrder[0].Id,
             passengerId: beyOrder[0].Passengers[0].Id,
-            tickNoAction: newUpdateSetting
+            tickNoAction: newUpdateSetting,
           }],
-          status: statusType === -1? 0: 1
-        }f
+          status: statusType === -1? 0: 1,
+          yatpRefundId: String(JSON.parse(this.updateSettingData.OriginalData).Id)
+        }
+        console.log(data);
         this.$axios.post('/refund/update', data)
           .then(res => {
             console.log(res);
