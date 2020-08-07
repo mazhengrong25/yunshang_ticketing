@@ -1,3 +1,10 @@
+/*
+ * @Description: 
+ * @Author: wish.WuJunLong
+ * @Date: 2020-03-11 17:32:01
+ * @LastEditTime: 2020-08-06 16:06:16
+ * @LastEditors: wish.WuJunLong
+ */ 
 /**
  * @Description: vue-cli 3.x配置文件
  * @author Wish

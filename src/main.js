@@ -1,3 +1,10 @@
+/*
+ * @Description: 
+ * @Author: wish.WuJunLong
+ * @Date: 2020-03-09 10:01:19
+ * @LastEditTime: 2020-08-06 18:36:05
+ * @LastEditors: wish.WuJunLong
+ */
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -66,6 +73,9 @@ Vue.component(ExTableColumn.name, ExTableColumn);
 
 import axios from "axios";
 Vue.prototype.$axios = axios;
+
+import moment from 'moment';
+Vue.prototype.$moment = moment;
 
 axios.defaults.baseURL = process.env.NODE_ENV === 'production'?'http://192.168.0.176:8006':''
 

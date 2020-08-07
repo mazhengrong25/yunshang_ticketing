@@ -2,55 +2,113 @@
   <div class="setting_table">
     <el-button class="config_add_btn" size="small" type="primary" @click="openSettingDialog('add')">新增</el-button>
 
-    <el-table
-      :data="dataList"
-      row-key="ID"
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-      stripe
-      border
-      @row-dblclick="dbClickOpenData"
-      ref="settingTable"
-      height="calc(100vh - 190px)"
-      highlight-current-row
-      style="width: 100%"
-    >
-      <el-table-column width="200" show-overflow-tooltip prop="project" label="渠道类型"></el-table-column>
-      <el-table-column label="渠道名称" width="300" show-overflow-tooltip prop="channel_name"></el-table-column>
-      <el-table-column label="是否可用" width="80">
-        <template v-slot="scope">
-          <el-switch
-            v-if="scope.row.type !== 'menu'"
-            v-model="scope.row.is_using"
-            @change="changeSetting(scope.row.is_using,scope.row)"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="退票渠道" width="80" show-overflow-tooltip prop="refund_channel"></el-table-column>
-      <el-table-column
-        align="center"
-        width="100"
-        show-overflow-tooltip
-        prop="request_way"
-        label="请求方式"
-      ></el-table-column>
-      <el-table-column align="left" show-overflow-tooltip prop="url" label="请求路径"></el-table-column>
-      <el-table-column align="center" show-overflow-tooltip prop="exchange_name" label="交换机名"></el-table-column>
-      <el-table-column align="center" show-overflow-tooltip width="200" prop="author" label="作者"></el-table-column>
-      <el-table-column fixed="right" align="center" label="操作" width="160">
-        <template slot-scope="scope" v-if="scope.row.type !== 'menu'">
-          <el-button @click="openSettingDialog('edit',scope.row)" type="primary" size="mini">编辑</el-button>
-          <el-button
-            class="delete_btn"
-            @click="deleteList(scope.row)"
-            type="primary"
-            plain
-            size="mini"
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+
+    <div class="setting_list">
+      <div class="list_title" @click="orderTableShow = !orderTableShow">国际</div>
+      <el-table
+          v-if="orderTableShow"
+          :data="dataList"
+          row-key="ID"
+          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+          stripe
+          border
+          @row-dblclick="dbClickOpenData"
+          ref="settingTable"
+          highlight-current-row
+          style="width: 100%"
+      >
+        <el-table-column width="200" show-overflow-tooltip prop="project" label="渠道类型"></el-table-column>
+        <el-table-column label="渠道名称" width="300" show-overflow-tooltip prop="channel_name"></el-table-column>
+        <el-table-column label="是否可用" width="80">
+          <template v-slot="scope">
+            <el-switch
+                v-if="scope.row.type !== 'menu'"
+                v-model="scope.row.is_using"
+                @change="changeSetting(scope.row.is_using,scope.row)"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="退票渠道" width="80" show-overflow-tooltip prop="refund_channel"></el-table-column>
+        <el-table-column
+            align="center"
+            width="100"
+            show-overflow-tooltip
+            prop="request_way"
+            label="请求方式"
+        ></el-table-column>
+        <el-table-column align="left" show-overflow-tooltip prop="url" label="请求路径"></el-table-column>
+        <el-table-column align="center" show-overflow-tooltip prop="exchange_name" label="交换机名"></el-table-column>
+        <el-table-column align="center" show-overflow-tooltip width="200" prop="author" label="作者"></el-table-column>
+        <el-table-column fixed="right" align="center" label="操作" width="160">
+          <template slot-scope="scope" v-if="scope.row.type !== 'menu'">
+            <el-button @click="openSettingDialog('edit',scope.row)" type="primary" size="mini">编辑</el-button>
+            <el-button
+                class="delete_btn"
+                @click="deleteList(scope.row)"
+                type="primary"
+                plain
+                size="mini"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <div class="setting_list">
+      <div class="list_title" @click="interOrderTableShow = !interOrderTableShow">国内</div>
+      <el-table
+          v-if="interOrderTableShow"
+          :data="interDataList"
+          row-key="ID"
+          :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+          stripe
+          border
+          @row-dblclick="dbClickOpenData"
+          ref="settingTable"
+          highlight-current-row
+          style="width: 100%"
+      >
+        <el-table-column width="200" show-overflow-tooltip prop="project" label="渠道类型"></el-table-column>
+        <el-table-column label="渠道名称" width="300" show-overflow-tooltip prop="channel_name"></el-table-column>
+        <el-table-column label="是否可用" width="80">
+          <template v-slot="scope">
+            <el-switch
+                v-if="scope.row.type !== 'menu'"
+                v-model="scope.row.is_using"
+                @change="changeSetting(scope.row.is_using,scope.row)"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="退票渠道" width="80" show-overflow-tooltip prop="refund_channel"></el-table-column>
+        <el-table-column
+            align="center"
+            width="100"
+            show-overflow-tooltip
+            prop="request_way"
+            label="请求方式"
+        ></el-table-column>
+        <el-table-column align="left" show-overflow-tooltip prop="url" label="请求路径"></el-table-column>
+        <el-table-column align="center" show-overflow-tooltip prop="exchange_name" label="交换机名"></el-table-column>
+        <el-table-column align="center" show-overflow-tooltip width="200" prop="author" label="作者"></el-table-column>
+        <el-table-column fixed="right" align="center" label="操作" width="160">
+          <template slot-scope="scope" v-if="scope.row.type !== 'menu'">
+            <el-button @click="openSettingDialog('edit',scope.row)" type="primary" size="mini">编辑</el-button>
+            <el-button
+                class="delete_btn"
+                @click="deleteList(scope.row)"
+                type="primary"
+                plain
+                size="mini"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
 
     <el-dialog
       :append-to-body="true"
@@ -69,6 +127,16 @@
         label-width="100px"
         class="demo-ruleForm"
       >
+        <el-form-item label="国际国内" prop="IsIntl">
+          <el-select
+              style="width: 100%"
+              v-model="ruleForm.IsIntl"
+              placeholder="请选择国内国际"
+          >
+            <el-option label="国内" value="no"></el-option>
+            <el-option label="国际" value="yes"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="渠道类型" prop="project">
           <el-input v-model="ruleForm.project"></el-input>
         </el-form-item>
@@ -134,11 +202,17 @@ export default {
   },
   data: () => ({
     dataList: [], // 配置列表
+    interDataList: [],
+    projectDataList: [],
     settingDialog: false, // 配置弹窗
     settingType: "", // 弹窗属性
 
+    orderTableShow: false,
+    interOrderTableShow: false,
+
     ruleForm: {
       // 弹窗字段
+      IsIntl: '',
       project: "",
       channel_name: "",
       request_way: "",
@@ -147,6 +221,10 @@ export default {
     },
     rules: {
       // 表单验证
+      IsIntl: [
+        // 渠道类型
+        { required: true, message: "请选择国内国际", trigger: "blur" }
+      ],
       project: [
         // 渠道类型
         { required: true, message: "请填写渠道类型", trigger: "blur" }
@@ -312,27 +390,50 @@ export default {
           let settingData = res.data.data;
           if (settingData.length > 0) {
             const listArr = [];
+            const interListArr = []
             settingData.forEach((el, index) => {
               console.log(el);
-              el.is_using = el.is_using === 'yes'
-              for (let i = 0; i < listArr.length; i++) {
-                if (listArr[i].project === el.project) {
-                  listArr[i].children.push(el);
-                  return;
+              if(el.IsIntl === 'yes'){
+                el.is_using = el.is_using === 'yes'
+                for (let i = 0; i < listArr.length; i++) {
+                  if (listArr[i].project === el.project) {
+                    listArr[i].children.push(el);
+                    return;
+                  }
                 }
+                listArr.push({
+                  project: el.project,
+                  ID: el.project + index,
+                  type: "menu",
+                  children: [el]
+                });
+              }else if(el.IsIntl === 'no'){
+                el.is_using = el.is_using === 'yes'
+                for (let i = 0; i < interListArr.length; i++) {
+                  if (interListArr[i].project === el.project) {
+                    interListArr[i].children.push(el);
+                    return;
+                  }
+                }
+                interListArr.push({
+                  project: el.project,
+                  ID: el.project + index,
+                  type: "menu",
+                  children: [el]
+                });
               }
-              listArr.push({
-                project: el.project,
-                ID: el.project + index,
-                type: "menu",
-                children: [el]
-              });
             });
-            listArr.map(res => {
+            listArr.forEach(res => {
               res.project = res.project + " (" + res.children.length + ")";
             });
-            console.log(listArr);
-            this.dataList = listArr;
+            interListArr.forEach(res => {
+              res.project = res.project + " (" + res.children.length + ")";
+            });
+
+            this.dataList = listArr
+            this.interDataList = interListArr
+            console.log(this.dataList);
+            console.log(this.interDataList);
           }
         } else {
           console.log(res);
@@ -392,6 +493,20 @@ export default {
 <style lang="less" scoped>
 .setting_table {
   position: relative;
+  .setting_list{
+    &:not(:last-child){
+      margin-bottom: 20px;
+    }
+    .list_title{
+      display: flex;
+      align-items: center;
+      background: #e5e9f2;
+      border-radius: 2px;
+      padding: 5px 10px;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+  }
   .config_add_btn{
     position: absolute;
     right: 0;

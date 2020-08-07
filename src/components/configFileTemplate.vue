@@ -177,6 +177,14 @@
           </el-row>
 
           <el-row :gutter="20">
+
+            <el-col :span="12">
+              <el-form-item label="豁免原因">
+                <el-input clearable v-model="configForm.forFreeReason" placeholder="请填写豁免原因"></el-input>
+              </el-form-item>
+            </el-col>
+
+
             <el-col :span="12">
               <el-form-item label="起飞时间段">
                 <!-- <el-date-picker
@@ -195,7 +203,9 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
+          </el-row>
 
+          <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="出票起始时间段">
                 <!-- <el-date-picker
@@ -214,11 +224,6 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
-
-
-          </el-row>
-
-          <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="有效期" prop="validate_time">
                 <!-- <el-date-picker
@@ -238,7 +243,8 @@
               </el-form-item>
             </el-col>
 
-
+          </el-row>
+          <el-row :gutter="20">
             <el-col :span="4">
               <el-form-item label="是否为NUC文件">
                 <el-switch
